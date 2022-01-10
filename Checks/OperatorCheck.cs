@@ -22,21 +22,21 @@ public class OperatorCheck
                 switch (child.ConcatOperator)
                 {
                     case "=":
-                        if (segment.SegmentType is SegmentType.DataVariable && AnalyzerHelper.SearchRecordParent(segment) is {} recordParent0 && AnalyzerHelper.SearchVariable(recordParent0) is DefinedIo { IoType: IoType.Out } variableEquals)
+                        if (AnalyzerHelper.SearchConcatParent(segment) is {SegmentType: SegmentType.DataVariable or SegmentType.VariableDeclaration} recordParent0 && AnalyzerHelper.SearchVariable(recordParent0) is DefinedIo { IoType: IoType.Out } variableEquals)
                         {
                             context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
                                 $"Invalid Operator '=' for {variableEquals.IoType} {segment}. Cannot read from Output, use Buffer instead", DiagnosticLevel.Error, child.ConcatOperatorIndex, child.ConcatOperatorIndex + child.ConcatOperator.Length));
                         }
                         break;
                     case ":=":
-                        if (segment.SegmentType is SegmentType.DataVariable && AnalyzerHelper.SearchRecordParent(segment) is {} recordParent && AnalyzerHelper.SearchVariable(recordParent) is { VariableType: VariableType.Io or VariableType.Signal or VariableType.RecordMember } variableIo)
+                        if (AnalyzerHelper.SearchConcatParent(segment) is {SegmentType: SegmentType.DataVariable} recordParent1  && AnalyzerHelper.SearchVariable(recordParent1) is { VariableType: VariableType.Io or VariableType.Signal or VariableType.RecordMember } variableIo)
                         {
                             context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
                                 $"Invalid Operator := for {variableIo.VariableType} {segment}. Use <= instead", DiagnosticLevel.Error, child.ConcatOperatorIndex, child.ConcatOperatorIndex + child.ConcatOperator.Length));
                         }
                         break;
                     case "<=" when !AnalyzerHelper.InParameter(segment):
-                        if (segment.SegmentType is SegmentType.DataVariable && AnalyzerHelper.SearchRecordParent(segment) is {} recordParent2 && AnalyzerHelper.SearchVariable(recordParent2) is {} variable)
+                        if (AnalyzerHelper.SearchConcatParent(segment) is {SegmentType: SegmentType.DataVariable or SegmentType.VariableDeclaration} recordParent2  && AnalyzerHelper.SearchVariable(recordParent2) is {} variable)
                         {
                             if (variable.VariableType is not (VariableType.Io or VariableType.Signal
                                 or VariableType.Unknown))
