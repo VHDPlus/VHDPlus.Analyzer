@@ -202,13 +202,15 @@ public static class ParserHelper
                         if (context.CurrentSegment.SegmentType is SegmentType.ConnectionsMember &&
                             context.CurrentConcatOperator is "=>")
                         {
-                            if(!context.AnalyzerContext.Connections.ContainsKey(context.CurrentSegment.NameOrValue.ToLower())) 
-                                context.AnalyzerContext.Connections.Add(context.CurrentSegment.NameOrValue.ToLower(), new ConnectionMember(context.CurrentSegment.NameOrValue, name));
+                            var connectionsName = context.CurrentSegment.NameOrValue.ToLower().Split('[')[0];
+                            if(!context.AnalyzerContext.Connections.ContainsKey(connectionsName)) 
+                                context.AnalyzerContext.Connections.Add(connectionsName, new ConnectionMember(connectionsName, name));
                         }
                         else
                         {
-                            if(!context.AnalyzerContext.Connections.ContainsKey(name.ToLower())) 
-                                context.AnalyzerContext.Connections.Add(name.ToLower(), new ConnectionMember(name));
+                            var connectionsName = name.ToLower().Split('[')[0];
+                            if(!context.AnalyzerContext.Connections.ContainsKey(connectionsName)) 
+                                context.AnalyzerContext.Connections.Add(connectionsName, new ConnectionMember(connectionsName));
                         }
                     }
                     return (SegmentType.ConnectionsMember, DataType.Unknown);
