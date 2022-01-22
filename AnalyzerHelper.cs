@@ -215,7 +215,7 @@ public static class AnalyzerHelper
     {
         while (s.Parent != null)
         {
-            if (!s.ConcatSegment || type.Contains(s.SegmentType)) return s;
+            if (!s.ConcatSegment || type.Contains(s.SegmentType) || s.ConcatOperator is "when" or "and" or "or") return s;
             s = s.Parent;
         }
         return s;

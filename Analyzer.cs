@@ -198,7 +198,7 @@ public static class Analyzer
                                     var newName = funcPar.NameOrValue;
                                     if (!variableOwner.Variables.ContainsKey(newName.ToLower()))
                                         variableOwner.Variables.Add(newName.ToLower(), 
-                                            new DefinedVariable(context.UnresolvedSeqFunctions[i], newName, seqVariable.Value.DataType, VariableType.Variable, context.UnresolvedSeqFunctions[i].Offset));
+                                            new DefinedVariable(context.UnresolvedSeqFunctions[i], newName, seqVariable.Value.DataType, seqVariable.Value.VariableType, context.UnresolvedSeqFunctions[i].Offset));
                                     else
                                     {
                                         context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,

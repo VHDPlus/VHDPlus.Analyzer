@@ -20,7 +20,7 @@ public class OperatorCheck
             {
                 if(child.SegmentType is SegmentType.Unknown) continue;
                 switch (child.ConcatOperator)
-                {
+                { 
                     case "=":
                         if (AnalyzerHelper.SearchConcatParent(segment) is {SegmentType: SegmentType.DataVariable or SegmentType.VariableDeclaration} recordParent0 && AnalyzerHelper.SearchVariable(recordParent0) is DefinedIo { IoType: IoType.Out } variableEquals)
                         {
@@ -36,7 +36,7 @@ public class OperatorCheck
                         }
                         break;
                     case "<=" when !AnalyzerHelper.InParameter(segment):
-                        if (AnalyzerHelper.SearchConcatParent(segment) is {SegmentType: SegmentType.DataVariable or SegmentType.VariableDeclaration} recordParent2  && AnalyzerHelper.SearchVariable(recordParent2) is {} variable)
+                        if (AnalyzerHelper.SearchConcatParent(segment) is {SegmentType: SegmentType.DataVariable or SegmentType.VariableDeclaration, ConcatOperator: not ("and" or "or" or "when")} recordParent2  && AnalyzerHelper.SearchVariable(recordParent2) is {} variable)
                         {
                             if (variable.VariableType is not (VariableType.Io or VariableType.Signal
                                 or VariableType.Unknown))
@@ -56,7 +56,7 @@ public class OperatorCheck
                                 {
                                     if (constantDrivers.ContainsKey(variable))
                                     {
-                                        if(constantDrivers[variable] != topLevel || topLevel.SegmentType is not SegmentType.Process)
+                                        if((constantDrivers[variable] != topLevel || topLevel.SegmentType is not SegmentType.Process) && AnalyzerHelper.SearchTopSegment(segment, SegmentType.Generate) == null)
                                             context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
                                                 $"Multiple constant drivers for {segment}. You can only drive a signal from one process", DiagnosticLevel.Error, child.ConcatOperatorIndex, child.ConcatOperatorIndex + child.ConcatOperator.Length));
                                     }
