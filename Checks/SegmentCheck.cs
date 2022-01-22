@@ -419,6 +419,10 @@ public static class SegmentCheck
                 yield return SegmentType.NativeDataValue;
                 yield return SegmentType.DataVariable;
                 break;
+            case SegmentType.ComponentMember:
+                yield return SegmentType.DataVariable;
+                yield return SegmentType.NativeDataValue;
+                break;
         }
     }
 
