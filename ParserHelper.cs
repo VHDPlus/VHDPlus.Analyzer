@@ -516,6 +516,7 @@ public static class ParserHelper
     public static DataType GetDeclaredDataType(AnalyzerContext context, string name)
     {
         var words = name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if(words.Length == 0) return DataType.Unknown;
         var typeStr = VhdlIos.Contains(words[0].ToLower()) && words.Length > 1 ? words[1] : words[0];
 
         return typeStr.ToLower() switch
