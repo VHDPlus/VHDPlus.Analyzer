@@ -72,23 +72,25 @@ public static class SegmentInfo
             "Allows to generate a component or other operations multiple times or if a condition is met"
         },
         { SegmentType.Null, "Performs no action: ... when(others) { null; }" },
-        { SegmentType.ParWhile, "Runs operation while condition met. Has to run in a finite amount of cycles" }
+        { SegmentType.ParWhile, "Runs operation while condition met. Has to run in a finite amount of cycles" },
+        { SegmentType.While, "Runs operation while condition met" }
     };
 
     private static readonly Dictionary<SegmentType, string> Snippets = new()
     {
-        { SegmentType.Main, "Main\n(\n$0\n)\n{\n\n}" },
-        { SegmentType.Package, "Package\n(\n$0\n)\n{\n\n}" },
-        { SegmentType.Component, "Component\n(\n$0\n)\n{\n\n}" },
-        { SegmentType.Generate, "Generate($0)\n{\n\n}" },
+        { SegmentType.Main, "Main\n(\n$0\n)\n{\n \n}" },
+        { SegmentType.Package, "Package\n(\n$0\n)\n{\n \n}" },
+        { SegmentType.Component, "Component\n(\n$0\n)\n{\n \n}" },
+        { SegmentType.Generate, "Generate($0)\n{\n \n}" },
         { SegmentType.Thread, "Thread\n{\n$0\n}" },
         { SegmentType.Process, "Process\n{\n$0\n}" },
         { SegmentType.If, "If($0)" },
         { SegmentType.Elsif, "Elsif($0)" },
         { SegmentType.Else, "Else" },
         { SegmentType.Vhdl, "VHDL\n{\n$0\n}" },
-        { SegmentType.For, "For($0)\n{\n\n}" },
-        { SegmentType.SeqFor, "SeqFor($0)\n{\n\n}" },
+        { SegmentType.For, "For($0)\n{\n \n}" },
+        { SegmentType.While, "While($0)\n{\n \n}" },
+        { SegmentType.SeqFor, "SeqFor($0)\n{\n \n}" },
     };
     
     private static readonly Dictionary<SegmentType, string> SnippetsParameter = new()
