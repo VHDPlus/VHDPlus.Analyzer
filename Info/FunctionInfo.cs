@@ -12,10 +12,11 @@ public static class FunctionInfo
             str += $"{par.Name} : {par.DataType}";
             if (par != function.Parameters.Last()) str += ", ";
         }
+
         str += $")\nreturn : {function.ReturnType}\n```";
         return str;
     }
-    
+
     public static string GetInfoMarkdown(CustomDefinedSeqFunction function)
     {
         var str = $"```vhdp\n{function.Name}(";
@@ -24,7 +25,8 @@ public static class FunctionInfo
             str += $"{par.Name} : {par.DataType}";
             if (par != function.Parameters.Last()) str += ", ";
         }
-        str += $")\n```";
+
+        str += ")\n```";
         return str;
     }
 

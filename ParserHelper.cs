@@ -1,13 +1,12 @@
 ﻿using VHDPlus.Analyzer.Diagnostics;
 using VHDPlus.Analyzer.Elements;
-using VHDPlus.Analyzer.Info;
 
 namespace VHDPlus.Analyzer;
 
 public static class ParserHelper
 {
     /// <summary>
-    /// After ': vector'length
+    ///     After ': vector'length
     /// </summary>
     public static readonly string[] VhdlAttributes =
     {
@@ -58,7 +57,8 @@ public static class ParserHelper
         return type;
     }
 
-    public static (SegmentType, DataType) CheckSegment(ref string name, SegmentParserContext context, bool checkVariable)
+    public static (SegmentType, DataType) CheckSegment(ref string name, SegmentParserContext context,
+        bool checkVariable)
     {
         var words = name.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (name == "")
@@ -135,10 +135,12 @@ public static class ParserHelper
             case SegmentType.Function:
             {
                 if (!context.AnalyzerContext.AvailableFunctions.ContainsKey(words.Last().ToLower()))
-                    context.AnalyzerContext.AddLocalFunction(words.Last().ToLower(), new CustomDefinedFunction(words.Last()));
+                    context.AnalyzerContext.AddLocalFunction(words.Last().ToLower(),
+                        new CustomDefinedFunction(words.Last()));
                 return (SegmentType.Function, DataType.Unknown);
             }
-            case SegmentType.Return when words.Length == 2 && context.CurrentSegment is {SegmentType: SegmentType.Function}:
+            case SegmentType.Return when words.Length == 2 && context.CurrentSegment is
+                { SegmentType: SegmentType.Function }:
                 var func = AnalyzerHelper.SearchFunction(context.CurrentSegment, context.CurrentSegment.LastName);
                 if (func != null)
                 {
@@ -146,28 +148,27 @@ public static class ParserHelper
                     func.ReturnType = dataType;
                     return (SegmentType.Return, dataType);
                 }
+
                 return (SegmentType.Return, DataType.Unknown);
             case SegmentType.SeqFunction:
                 return (SegmentType.SeqFunction, DataType.Unknown);
             case SegmentType.For:
                 if (words.Length > 1)
-                {
                     if (!context.CurrentSegment.Variables.ContainsKey(words[1].ToLower()))
-                    {
                         context.CurrentSegment.Variables.Add(words[1].ToLower(),
                             new DefinedVariable(context.CurrentSegment, words[1], DataType.Integer,
                                 VariableType.Iterator,
                                 context.CurrentIndex - name.Length));
-                    }
-                }
                 return (type, DataType.Unknown);
             case SegmentType.Unknown:
             case SegmentType.NativeDataValue:
                 if (type is not SegmentType.NativeDataValue && (context.CurrentConcatOperator is ":" ||
                                                                 VhdlIos.Contains(context.CurrentConcatOperator) &&
-                                                                context.CurrentSegment is not { Parent.SegmentType: SegmentType.For } ))
+                                                                context.CurrentSegment is not
+                                                                    { Parent.SegmentType: SegmentType.For }))
                 {
-                    if (context.VhdlMode && (context.CurrentSegment is { ConcatOperator: "of" } || name.EndsWith("port map", StringComparison.OrdinalIgnoreCase)))
+                    if (context.VhdlMode && (context.CurrentSegment is { ConcatOperator: "of" } ||
+                                             name.EndsWith("port map", StringComparison.OrdinalIgnoreCase)))
                         return (SegmentType.Attribute, DataType.Unknown);
                     var dataType = ParseDeclaration(context, name);
                     return (SegmentType.TypeUsage, dataType);
@@ -203,52 +204,60 @@ public static class ParserHelper
                             context.CurrentConcatOperator is "=>")
                         {
                             var connectionsName = context.CurrentSegment.NameOrValue.ToLower().Split('[')[0];
-                            if(!context.AnalyzerContext.Connections.ContainsKey(connectionsName)) 
-                                context.AnalyzerContext.Connections.Add(connectionsName, new ConnectionMember(connectionsName, name));
+                            if (!context.AnalyzerContext.Connections.ContainsKey(connectionsName))
+                                context.AnalyzerContext.Connections.Add(connectionsName,
+                                    new ConnectionMember(connectionsName, name));
                         }
                         else
                         {
                             var connectionsName = name.ToLower().Split('[')[0];
-                            if(!context.AnalyzerContext.Connections.ContainsKey(connectionsName)) 
-                                context.AnalyzerContext.Connections.Add(connectionsName, new ConnectionMember(connectionsName));
+                            if (!context.AnalyzerContext.Connections.ContainsKey(connectionsName))
+                                context.AnalyzerContext.Connections.Add(connectionsName,
+                                    new ConnectionMember(connectionsName));
                         }
                     }
+
                     return (SegmentType.ConnectionsMember, DataType.Unknown);
                 }
                 else if (checkVariable && GetNativeDataType(name) is { } dataType && dataType != DataType.Unknown)
                 {
                     return (SegmentType.NativeDataValue, dataType);
                 }
-                else if (context.CurrentConcatOperator is "." && AnalyzerHelper.SearchVariable(context.CurrentSegment, context.CurrentSegment.NameOrValue) is { } defined)
+                else if (context.CurrentConcatOperator is "." &&
+                         AnalyzerHelper.SearchVariable(context.CurrentSegment, context.CurrentSegment.NameOrValue) is
+                             { } defined)
                 {
                     if (defined.DataType is CustomDefinedRecord cdt)
                         if (cdt.Variables.ContainsKey(name.ToLower()))
                             return (SegmentType.DataVariable, cdt.Variables[name.ToLower()].DataType);
                     return (SegmentType.Unknown, DataType.Unknown);
                 }
-                else if (context.CurrentSegment.SegmentType is SegmentType.NewComponent || context.CurrentConcatOperator is "," && AnalyzerHelper.SearchConcatParent(context.CurrentSegment).Parent is {SegmentType: SegmentType.NewComponent})
+                else if (context.CurrentSegment.SegmentType is SegmentType.NewComponent ||
+                         context.CurrentConcatOperator is "," &&
+                         AnalyzerHelper.SearchConcatParent(context.CurrentSegment).Parent is
+                             { SegmentType: SegmentType.NewComponent })
                 {
                     return (SegmentType.ComponentMember, DataType.Unknown);
                 }
                 else if (context.CurrentSegment.SegmentType is SegmentType.EnumDeclaration or SegmentType.Enum &&
                          context.CurrentParsePosition is ParsePosition.Parameter)
                 {
-                    var topEnum = AnalyzerHelper.SearchTopSegment(context.CurrentSegment, SegmentType.EnumDeclaration)?.Parent;
+                    var topEnum = AnalyzerHelper.SearchTopSegment(context.CurrentSegment, SegmentType.EnumDeclaration)
+                        ?.Parent;
                     if (topEnum is { SegmentType: SegmentType.Type })
                     {
                         var enumName = topEnum.NameOrValue.Split(' ').Last().ToLower();
                         if (context.AnalyzerContext.AvailableTypes.ContainsKey(enumName) &&
                             context.AnalyzerContext.AvailableTypes[enumName] is CustomDefinedEnum customEnum)
-                        {
                             customEnum.States.Add(name);
-                        }
 
                         return (SegmentType.Enum, DataType.Unknown);
                     }
 
                     return (SegmentType.Unknown, DataType.Unknown);
                 }
-                else if (context.CurrentConcatOperator is not "'" && AnalyzerHelper.SearchVariable(context.CurrentSegment, name) is
+                else if (context.CurrentConcatOperator is not "'" &&
+                         AnalyzerHelper.SearchVariable(context.CurrentSegment, name) is
                              { } variable)
                 {
                     return (SegmentType.DataVariable, variable.DataType);
@@ -257,7 +266,8 @@ public static class ParserHelper
                 {
                     return (SegmentType.DataVariable, definedEnum);
                 }
-                else if (context.CurrentChar is '(' && CustomBuiltinFunction.DefaultBuiltinFunctions.ContainsKey(name.ToLower()))
+                else if (context.CurrentChar is '(' &&
+                         CustomBuiltinFunction.DefaultBuiltinFunctions.ContainsKey(name.ToLower()))
                 {
                     return (SegmentType.CustomBuiltinFunction, DataType.Unknown);
                 }
@@ -267,7 +277,8 @@ public static class ParserHelper
                 }
                 else if (context.CurrentSegment.SegmentType is SegmentType.Include or SegmentType.IncludePackage)
                 {
-                    if(!context.AnalyzerContext.Includes.Any() || context.CurrentConcatOperator is not ".") context.AnalyzerContext.Includes.Add("");
+                    if (!context.AnalyzerContext.Includes.Any() || context.CurrentConcatOperator is not ".")
+                        context.AnalyzerContext.Includes.Add("");
                     context.AnalyzerContext.Includes[^1] += (context.CurrentConcatOperator is "." ? "." : "") + name;
                     return (SegmentType.IncludePackage, DataType.Unknown);
                 }
@@ -333,7 +344,8 @@ public static class ParserHelper
         {
             var typeName = array.Parent?.NameOrValue.Split(' ').Last().ToLower() ?? string.Empty;
             if (context.AnalyzerContext.AvailableTypes.ContainsKey(typeName) &&
-                context.AnalyzerContext.AvailableTypes[typeName] is CustomDefinedArray cArray) cArray.ArrayType = dataType;
+                context.AnalyzerContext.AvailableTypes[typeName] is CustomDefinedArray cArray)
+                cArray.ArrayType = dataType;
         }
 
         return dataType;
@@ -348,9 +360,10 @@ public static class ParserHelper
         var variableType = VhdlIos.Contains(context.CurrentConcatOperator) ? VariableType.Io : VariableType.Unknown;
 
         Enum.TryParse(context.CurrentConcatOperator, true, out IoType ioType);
-        
+
         var segment = context.CurrentSegment;
-        if(segment.SegmentType is not (SegmentType.Unknown or SegmentType.VariableDeclaration or SegmentType.EmptyName or SegmentType.DataVariable or SegmentType.Enum or SegmentType.Attribute)) return DataType.Unknown;
+        if (segment.SegmentType is not (SegmentType.Unknown or SegmentType.VariableDeclaration or SegmentType.EmptyName
+            or SegmentType.DataVariable or SegmentType.Enum or SegmentType.Attribute)) return DataType.Unknown;
         do
         {
             if (segment.ConcatOperator is not ":")
@@ -363,21 +376,19 @@ public static class ParserHelper
                     break;
                 }
             }
-            
+
             segment = segment.Parent;
         } while (segment != null);
 
         if (segment == null)
-        {
             //TODO throw error
             return DataType.Unknown;
-        }
 
         var dataType = GetDeclaredDataType(context.AnalyzerContext, name);
 
-        if (segment.Parent is {SegmentType: SegmentType.Generic})  variableType = VariableType.Generic;
+        if (segment.Parent is { SegmentType: SegmentType.Generic }) variableType = VariableType.Generic;
         else if (segment.Parent is { SegmentType: SegmentType.Record }) variableType = VariableType.RecordMember;
-        
+
         foreach (var s in names)
         {
             var decl = s.NameOrValue.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -390,14 +401,17 @@ public static class ParserHelper
             var variableOwner =
                 GetVariableOwner(context.AnalyzerContext.AvailableTypes, context.CurrentSegment, variableType);
 
-            if (variableOwner is Segment { SegmentType: SegmentType.SeqFunction } seqFunc && AnalyzerHelper.SearchSeqFunction(context.CurrentSegment, seqFunc.LastName.ToLower()) is {} seqOwner)
+            if (variableOwner is Segment { SegmentType: SegmentType.SeqFunction } seqFunc &&
+                AnalyzerHelper.SearchSeqFunction(context.CurrentSegment, seqFunc.LastName.ToLower()) is { } seqOwner)
             {
                 var variable = new DefinedVariable(segment, varName, dataType, variableType, context.CurrentIndex);
 
-                if(!variableOwner.Variables.ContainsKey(varName.ToLower()))
+                if (!variableOwner.Variables.ContainsKey(varName.ToLower()))
                     variableOwner.Variables.Add(varName.ToLower(), variable);
-                
-                if (context.CurrentParsePosition is ParsePosition.Parameter && AnalyzerHelper.SearchParameterOwner(context.CurrentSegment) is {SegmentType: SegmentType.SeqFunction})
+
+                if (context.CurrentParsePosition is ParsePosition.Parameter &&
+                    AnalyzerHelper.SearchParameterOwner(context.CurrentSegment) is
+                        { SegmentType: SegmentType.SeqFunction })
                 {
                     seqOwner.Parameters.Add(new FunctionParameter(varName.ToLower(), dataType));
                 }
@@ -405,9 +419,7 @@ public static class ParserHelper
                 {
                     //Exposing variables from seqfunction
                     if (!seqOwner.ExposingVariables.ContainsKey(varName.ToLower()))
-                    {
                         seqOwner.ExposingVariables.Add(varName.ToLower(), variable);
-                    }
                 }
             }
             else
@@ -415,12 +427,11 @@ public static class ParserHelper
                 if (variableOwner is Segment { SegmentType: SegmentType.Function } func &&
                     AnalyzerHelper.SearchFunction(context.CurrentSegment, func.LastName.ToLower()) is
                         { } funcOwner)
-                {
-                    if (context.CurrentParsePosition is ParsePosition.Parameter && context.CurrentSegment.Parent != null && AnalyzerHelper.SearchParameterOwner(context.CurrentSegment.Parent) is {SegmentType: SegmentType.Function})
-                    {
+                    if (context.CurrentParsePosition is ParsePosition.Parameter &&
+                        context.CurrentSegment.Parent != null &&
+                        AnalyzerHelper.SearchParameterOwner(context.CurrentSegment.Parent) is
+                            { SegmentType: SegmentType.Function })
                         funcOwner.Parameters.Add(new FunctionParameter(varName.ToLower(), dataType));
-                    }
-                }
 
                 if (!variableOwner.Variables.ContainsKey(varName.ToLower()))
                 {
@@ -428,12 +439,13 @@ public static class ParserHelper
                     {
                         var variable = new DefinedIo(segment, varName, dataType, variableType, ioType,
                             context.CurrentIndex);
-                    
+
                         variableOwner.Variables.Add(varName.ToLower(), variable);
                     }
                     else
                     {
-                        var variable = new DefinedVariable(segment, varName, dataType, variableType, context.CurrentIndex);
+                        var variable = new DefinedVariable(segment, varName, dataType, variableType,
+                            context.CurrentIndex);
                         variableOwner.Variables.Add(varName.ToLower(), variable);
                         if (variableType == VariableType.Constant &&
                             AnalyzerHelper.SearchTopSegment(segment, SegmentType.Package) != null)
@@ -447,7 +459,6 @@ public static class ParserHelper
                         off + varName.Length));
                 }
             }
-            
         }
 
         return dataType;
@@ -494,7 +505,7 @@ public static class ParserHelper
                 return DataType.Integer;
             case > 0 when tr.All(x => char.IsDigit(x) || x is '.' or 'e'):
                 return DataType.Real;
-            case > 1 when (tr[0] == '"' || (tr[0] is 's' or 'x' && tr[1] == '"')) && tr[^1] == '"':
+            case > 1 when (tr[0] == '"' || tr[0] is 's' or 'x' && tr[1] == '"') && tr[^1] == '"':
                 return DataType.StdLogicVector;
             case > 3 when tr is "false" or "true":
                 return DataType.Boolean;
@@ -516,7 +527,7 @@ public static class ParserHelper
     public static DataType GetDeclaredDataType(AnalyzerContext context, string name)
     {
         var words = name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if(words.Length == 0) return DataType.Unknown;
+        if (words.Length == 0) return DataType.Unknown;
         var typeStr = VhdlIos.Contains(words[0].ToLower()) && words.Length > 1 ? words[1] : words[0];
 
         return typeStr.ToLower() switch

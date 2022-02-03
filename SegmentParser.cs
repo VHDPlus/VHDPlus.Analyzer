@@ -1,5 +1,4 @@
-﻿using System.Xml.Serialization;
-using VHDPlus.Analyzer.Diagnostics;
+﻿using VHDPlus.Analyzer.Diagnostics;
 using VHDPlus.Analyzer.Elements;
 
 namespace VHDPlus.Analyzer;
@@ -27,7 +26,9 @@ public static class SegmentParser
             switch (context.CurrentChar) //Detect comments and newline
             {
                 case '\n':
-                    if (lineComment) aC.Comments.Add(new FileComment(new Range(lineCommentStartOffset, context.CurrentIndex-1), content[lineCommentStartOffset..(context.CurrentIndex-1)]));
+                    if (lineComment)
+                        aC.Comments.Add(new FileComment(new Range(lineCommentStartOffset, context.CurrentIndex - 1),
+                            content[lineCommentStartOffset..(context.CurrentIndex - 1)]));
                     lineComment = false;
                     preProcessor = false;
                     context.NewLine();
@@ -47,13 +48,15 @@ public static class SegmentParser
                         blockComment = true;
                         blockCommentStartOffset = context.CurrentIndex;
                     }
+
                     break;
                 case '#':
-                    if(!context.InString) preProcessor = true;
+                    if (!context.InString) preProcessor = true;
                     break;
             }
 
-            if (!lineComment && !blockComment && !preProcessor) //Not in a comment & indentation removed & no newline char
+            if (!lineComment && !blockComment &&
+                !preProcessor) //Not in a comment & indentation removed & no newline char
             {
                 if (context.CurrentChar is '\n') context.CurrentChar = ' ';
                 ParseSegment(context);
@@ -63,13 +66,13 @@ public static class SegmentParser
             {
                 case '/':
                     if (context.LastChar == '*')
-                    {
                         if (blockComment)
                         {
                             blockComment = false;
-                            aC.Comments.Add(new FileComment(new Range(blockCommentStartOffset, context.CurrentIndex+1), content[blockCommentStartOffset..(context.CurrentIndex+1)]));
+                            aC.Comments.Add(new FileComment(
+                                new Range(blockCommentStartOffset, context.CurrentIndex + 1),
+                                content[blockCommentStartOffset..(context.CurrentIndex + 1)]));
                         }
-                    }
 
                     break;
             }
@@ -83,7 +86,8 @@ public static class SegmentParser
 
         if (context.CurrentSegment.Parent != null)
         {
-            context.AnalyzerContext.Diagnostics.Add(new GenericAnalyzerDiagnostic(context.AnalyzerContext, "Unexpected end of file",
+            context.AnalyzerContext.Diagnostics.Add(new GenericAnalyzerDiagnostic(context.AnalyzerContext,
+                "Unexpected end of file",
                 DiagnosticLevel.Error, content.Length > 1 ? content.Length - 2 : 0, content.Length - 1));
             while (context.PopBlock())
             {
@@ -107,12 +111,8 @@ public static class SegmentParser
         }
 
         if (context.VhdlMode)
-        {
             if (context.CurrentChar is '}')
-            {
                 context.VhdlMode = false;
-            }
-        }
 
         if (context.InString)
         {
@@ -156,6 +156,7 @@ public static class SegmentParser
                             context.PushSegment();
                             context.PopSegment();
                         }
+
                         break;
                     case '+':
                     case '-' when context.NextChar != '\'':
@@ -239,6 +240,7 @@ public static class SegmentParser
                             context.PushSegment();
                             context.PopSegment();
                         }
+
                         if (context.LastCharNoWhiteSpace == ')') context.PopSegment();
                         break;
                     case '+':
@@ -344,7 +346,7 @@ public static class SegmentParser
         if (!context.NextChars(op)) return false;
         context.SkipIndex(op.Length - 1);
         if (!context.CurrentEmpty() || context.LastCharNoWhiteSpace is '(' || context.Concat) context.PushSegment();
-        if(!(context.VhdlMode && op is "is" && context.CurrentSegment.SegmentType is SegmentType.Case))
+        if (!(context.VhdlMode && op is "is" && context.CurrentSegment.SegmentType is SegmentType.Case))
             context.CurrentConcatOperator = op;
         return true;
     }
@@ -362,7 +364,9 @@ public static class SegmentParser
 
                 if (lastWord == "") return;
 
-                if (lastWord is "to" or "end" || lastWord is "when" && AnalyzerHelper.SearchConcatParent(context.CurrentSegment, SegmentType.Case) is not {SegmentType: SegmentType.Case} ||
+                if (lastWord is "to" or "end" || lastWord is "when" &&
+                    AnalyzerHelper.SearchConcatParent(context.CurrentSegment, SegmentType.Case) is not
+                        { SegmentType: SegmentType.Case } ||
                     lastWord == "else" && (context.CurrentConcatOperator == "when" ||
                                            context.CurrentSegment.ConcatOperator == "when") ||
                     ParserHelper.VhdlIos.Contains(lastWord))
@@ -371,23 +375,22 @@ public static class SegmentParser
                         lastWord.Length);
                     context.LastInnerIndex = context.CurrentInnerIndex + current.Length - lastWord.Length - 1;
                     context.PushSegment();
-                    if(lastWord is "end") context.PopSegment();
+                    if (lastWord is "end") context.PopSegment();
                     context.CurrentInnerIndex = context.CurrentIndex - lastWord.Length;
                     context.CurrentConcatOperator = lastWord;
                 }
+
                 {
                     if (lastWord is "select")
                     {
                         context.CurrentInner.Remove(context.CurrentInner.Length - lastWord.Length,
                             lastWord.Length);
                         context.LastInnerIndex = context.CurrentInnerIndex + current.Length - lastWord.Length - 1;
-                        if (words.Length > 1 || context.Concat)
-                        {
-                            context.PushSegment();
-                        }
+                        if (words.Length > 1 || context.Concat) context.PushSegment();
                         context.CurrentInnerIndex = context.CurrentIndex - lastWord.Length;
                         context.CurrentConcatOperator = lastWord;
                     }
+
                     if (context.VhdlMode)
                     {
                         if (lastWord is "then" or "begin" or "is" or "generate" or "loop")
@@ -395,10 +398,7 @@ public static class SegmentParser
                             context.CurrentInner.Remove(context.CurrentInner.Length - lastWord.Length,
                                 lastWord.Length);
                             context.LastInnerIndex = context.CurrentInnerIndex + current.Length - lastWord.Length - 1;
-                            if (words.Length > 1 || context.Concat)
-                            {
-                                context.PushSegment();
-                            }
+                            if (words.Length > 1 || context.Concat) context.PushSegment();
                             context.CurrentInnerIndex = context.CurrentIndex - lastWord.Length;
                         }
 
@@ -419,10 +419,7 @@ public static class SegmentParser
                     }
                     else
                     {
-                        if (context.CurrentConcatOperator == "is" && lastWord is "record")
-                        {
-                            context.PushSegment();
-                        }
+                        if (context.CurrentConcatOperator == "is" && lastWord is "record") context.PushSegment();
                     }
                 }
             }

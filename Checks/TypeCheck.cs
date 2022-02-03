@@ -15,61 +15,60 @@ public static class TypeCheck
         foreach (var segment in segments)
         {
             if (segment.SegmentType is SegmentType.Vhdl) continue;
-            
+
             foreach (var child in segment.Children)
-            {
                 if (child.ConcatOperator != null)
                     CheckTypePair(context, child.ConcatOperator, child, segment);
-            }
 
             if (segment.SegmentType is SegmentType.VhdlFunction or SegmentType.NewFunction
                 or SegmentType.CustomBuiltinFunction)
-            {
-                CheckFunctionParameter(context, segment); 
-            }
-                
+                CheckFunctionParameter(context, segment);
+
             CheckTypes(context, segment.Children);
-            
-            foreach (var par in segment.Parameter)
-            {
-                CheckTypes(context, par);
-            }
+
+            foreach (var par in segment.Parameter) CheckTypes(context, par);
         }
     }
 
     private static void CheckFunctionParameter(AnalyzerContext context, Segment function)
     {
-        CustomBuiltinFunction.DefaultBuiltinFunctions.TryGetValue(function.LastName.ToLower(), out CustomBuiltinFunction? builtin);
+        CustomBuiltinFunction.DefaultBuiltinFunctions.TryGetValue(function.LastName.ToLower(), out var builtin);
         IParameterOwner? func = builtin;
         func ??= AnalyzerHelper.SearchFunction(function, function.LastName);
         func ??= AnalyzerHelper.SearchSeqFunction(function, function.LastName);
         if (func == null) return;
-        var funcPar = function.Parameter.Any() ? (function.Parameter[0].Any() ? function.Parameter[0][0] : null) : null;
+        var funcPar = function.Parameter.Any() ? function.Parameter[0].Any() ? function.Parameter[0][0] : null : null;
         var i = 0;
-        for(; funcPar != null; i++)
+        for (; funcPar != null; i++)
         {
             if (func.Parameters.Count > i)
             {
                 var (fD, segment) = ChildOperatorCheck(funcPar);
                 if (fD != DataType.Unknown && !AnalyzerHelper.AreTypesCompatible(fD, func.Parameters[i].DataType, "="))
-                {
-                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Invalid Parameter of type {fD}. Expected {func.Parameters[i].DataType}", DiagnosticLevel.Error, funcPar));
-                }
+                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                        $"Invalid Parameter of type {fD}. Expected {func.Parameters[i].DataType}",
+                        DiagnosticLevel.Error, funcPar));
             }
             else
             {
-                context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, "More parameters provided than expected", DiagnosticLevel.Warning, funcPar));
+                context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, "More parameters provided than expected",
+                    DiagnosticLevel.Warning, funcPar));
                 break;
             }
+
             funcPar = AnalyzerHelper.SearchNextOperatorChild(funcPar, ",");
         }
-        if(func.Parameters.Count > i+1) context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, "Less parameters provided than expected", DiagnosticLevel.Warning, function));
+
+        if (func.Parameters.Count > i + 1)
+            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, "Less parameters provided than expected",
+                DiagnosticLevel.Warning, function));
     }
 
     private static void CheckTypePair(AnalyzerContext context, string currentOperator, Segment from, Segment to)
     {
         //Check types
-        if (currentOperator != "when" && currentOperator != "is" && currentOperator != "else" && currentOperator != "," &&
+        if (currentOperator != "when" && currentOperator != "is" && currentOperator != "else" &&
+            currentOperator != "," &&
             currentOperator != "and" && currentOperator != "." && currentOperator != ":" && currentOperator != "or" &&
             currentOperator != "of" && currentOperator != "not")
         {
@@ -80,12 +79,14 @@ public static class TypeCheck
             if (fD != DataType.Others && fD != DataType.Unknown && to.DataType != DataType.Unknown &&
                 to.DataType != DataType.Others)
             {
-                if (!AnalyzerHelper.InParameter(from) && to is { Parent: { }, ConcatOperator: "=" or "<" or ">" or ">=" or "<=" or "/=" } && to.DataType == DataType.Integer
-                                                                             && (to.Parent.DataType ==
-                                                                                 DataType.Integer ||
-                                                                                 to.Parent.DataType == DataType.Unknown)
-                                                                             && from.ConcatOperator is not ("-" or "+"
-                                                                                 or "*" or "/"))
+                if (!AnalyzerHelper.InParameter(from) &&
+                    to is { Parent: { }, ConcatOperator: "=" or "<" or ">" or ">=" or "<=" or "/=" } &&
+                    to.DataType == DataType.Integer
+                    && (to.Parent.DataType ==
+                        DataType.Integer ||
+                        to.Parent.DataType == DataType.Unknown)
+                    && from.ConcatOperator is not ("-" or "+"
+                        or "*" or "/"))
                     tD = DataType.Boolean;
 
                 var operation = currentOperator switch
@@ -131,7 +132,8 @@ public static class TypeCheck
 
         switch (child.ConcatOperator)
         {
-            case "<" or ">" or "=" or "/=" when s.ConcatOperator is not ("/" or "+" or "-" or "*" or "**" or "mod" or "&"):
+            case "<" or ">" or "=" or "/="
+                when s.ConcatOperator is not ("/" or "+" or "-" or "*" or "**" or "mod" or "&"):
                 return (DataType.Boolean, s);
             case "&" when (cD == DataType.StdLogicVector || cD == DataType.StdLogic) &&
                           (sD == DataType.StdLogicVector || sD == DataType.StdLogic):
@@ -161,6 +163,7 @@ public static class TypeCheck
             if (AnalyzerHelper.SearchFunction(s, s.NameOrValue) is { } func) return func.ReturnType;
             return type;
         }
+
         if (par.Any() && AnalyzerHelper.SearchOperatorChild(par.First(), "downto") != null) return type;
         if (type == DataType.StdLogicVector || type == DataType.Signed) return DataType.StdLogic;
         if (type == DataType.Unsigned) return DataType.StdLogic;

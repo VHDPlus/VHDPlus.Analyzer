@@ -54,7 +54,7 @@ public static class PrintSegment
         {
             if (noBracket)
             {
-                if(start.SymSegment)
+                if (start.SymSegment)
                     sb.Append(";");
             }
             else

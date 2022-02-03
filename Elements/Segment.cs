@@ -60,11 +60,26 @@ public enum SegmentType
     Attribute,
     Begin,
     Then,
-    Port,
+    Port
 }
 
 public class Segment : IVariableOwner
 {
+    public Segment(AnalyzerContext context, Segment? parent, string nameOrValue, SegmentType segmentType,
+        DataType dataType, int offset, bool symSegment,
+        string? concatOperator = null, int concatOperatorIndex = 0, int parameterStartIndex = 0)
+    {
+        Context = context;
+        Parent = parent;
+        NameOrValue = nameOrValue;
+        SegmentType = segmentType;
+        DataType = dataType;
+        Offset = offset;
+        SymSegment = symSegment;
+        ConcatOperator = concatOperator;
+        ConcatOperatorIndex = concatOperatorIndex;
+    }
+
     public AnalyzerContext Context { get; }
     public SegmentType SegmentType { get; set; }
     public DataType DataType { get; set; }
@@ -78,26 +93,12 @@ public class Segment : IVariableOwner
     public string? ConcatOperator { get; set; }
     public int ConcatOperatorIndex { get; }
     public bool SymSegment { get; } //Segment ending with ;
+
+    public string LastName => string.IsNullOrEmpty(NameOrValue) ? "" : NameOrValue.Split(' ').Last();
     public Dictionary<string, DefinedVariable> Variables { get; } = new();
 
-    public Segment(AnalyzerContext context, Segment? parent, string nameOrValue, SegmentType segmentType, DataType dataType, int offset, bool symSegment,
-        string? concatOperator = null, int concatOperatorIndex = 0, int parameterStartIndex = 0)
-    {
-        Context = context;
-        Parent = parent;
-        NameOrValue = nameOrValue;
-        SegmentType = segmentType;
-        DataType = dataType;
-        Offset = offset;
-        SymSegment = symSegment;
-        ConcatOperator = concatOperator;
-        ConcatOperatorIndex = concatOperatorIndex;
-    }
-    
     public override string ToString()
     {
         return NameOrValue;
     }
-
-    public string LastName => string.IsNullOrEmpty(NameOrValue) ? "" : NameOrValue.Split(' ').Last();
 }

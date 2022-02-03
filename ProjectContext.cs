@@ -1,6 +1,4 @@
-﻿using VHDPlus.Analyzer.Elements;
-
-namespace VHDPlus.Analyzer;
+﻿namespace VHDPlus.Analyzer;
 
 public class ProjectContext
 {

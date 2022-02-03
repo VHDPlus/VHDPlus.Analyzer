@@ -13,11 +13,10 @@ public enum ParsePosition
 
 public class SegmentParserContext
 {
+    private string? _currentConcatOperator;
     public ParsePosition CurrentParsePosition = ParsePosition.Body;
 
     public bool InString, IgnoreSegment;
-    
-    public bool VhdlMode { get; set; }
 
     public SegmentParserContext(AnalyzerContext analyzerContext, string text)
     {
@@ -27,6 +26,8 @@ public class SegmentParserContext
         LastCharNoWhiteSpace = '\n';
         Text = text;
     }
+
+    public bool VhdlMode { get; set; }
 
     public AnalyzerContext AnalyzerContext { get; }
     public StringBuilder CurrentInner { get; } = new();
@@ -42,7 +43,6 @@ public class SegmentParserContext
     private string Text { get; }
 
     public Segment CurrentSegment { get; set; }
-    private string? _currentConcatOperator;
 
     public string? CurrentConcatOperator
     {
@@ -53,6 +53,7 @@ public class SegmentParserContext
             if (value != null) CurrentConcatOperatorIndex = CurrentIndex - value.Length + 1;
         }
     }
+
     public bool Concat => CurrentConcatOperator != null;
     public int CurrentConcatOperatorIndex { get; private set; }
     public int ParameterDepth { get; set; }
@@ -113,7 +114,7 @@ public class SegmentParserContext
         var (segmentType, dataType) = ParserHelper.CheckSegment(ref value, this, Concat || parameter);
 
         var newSegment = new Segment(AnalyzerContext, CurrentSegment, value, segmentType, dataType,
-            value is "" ? CurrentIndex-1 : CurrentInnerIndex, CurrentChar == ';',
+            value is "" ? CurrentIndex - 1 : CurrentInnerIndex, CurrentChar == ';',
             CurrentConcatOperator, CurrentConcatOperatorIndex);
 
         var words = value.Split(' ');
@@ -127,7 +128,9 @@ public class SegmentParserContext
             case SegmentType.TypeUsage when dataType == DataType.Unknown:
                 AnalyzerContext.UnresolvedTypes.Add(newSegment);
                 break;
-            case SegmentType.Return when dataType == DataType.Unknown && CurrentSegment.SegmentType is SegmentType.Function && !CurrentSegment.Children.Any():
+            case SegmentType.Return when dataType == DataType.Unknown &&
+                                         CurrentSegment.SegmentType is SegmentType.Function &&
+                                         !CurrentSegment.Children.Any():
                 AnalyzerContext.UnresolvedTypes.Add(newSegment);
                 break;
             case SegmentType.Vhdl:
@@ -142,28 +145,28 @@ public class SegmentParserContext
             case SegmentType.SeqFunction:
                 if (words.Length > 0)
                 {
-                    if(!AnalyzerContext.AvailableSeqFunctions.ContainsKey(words.Last().ToLower()))
-                        AnalyzerContext.AddLocalSeqFunction(words.Last().ToLower(), new CustomDefinedSeqFunction(newSegment, words.Last()));
-                    else
+                    if (!AnalyzerContext.AvailableSeqFunctions.ContainsKey(words.Last().ToLower()))
                     {
-                        //TODO Error
+                        AnalyzerContext.AddLocalSeqFunction(words.Last().ToLower(),
+                            new CustomDefinedSeqFunction(newSegment, words.Last()));
                     }
                 }
+
                 break;
         }
 
         ClearCurrent();
         CurrentConcatOperator = null;
-        
+
         if (segmentType is SegmentType.VhdlEnd)
         {
             if (CurrentSegment.SegmentType is SegmentType.Begin or SegmentType.Then) PopBlock();
             PopSegment();
             if (CurrentSegment.SegmentType is SegmentType.While && value.ToLower() is "loop") PopSegment();
             newSegment = new Segment(AnalyzerContext, CurrentSegment, "end " + value, segmentType, dataType,
-                newSegment.Offset, newSegment.SymSegment,
-                null);
+                newSegment.Offset, newSegment.SymSegment);
         }
+
         if (parameter)
         {
             if (!CurrentSegment.Parameter.Any()) CurrentSegment.Parameter.Add(new List<Segment>());
@@ -176,8 +179,7 @@ public class SegmentParserContext
 
         CurrentSegment = newSegment;
     }
-    
-    
+
 
     public void PopTempBlocks()
     {

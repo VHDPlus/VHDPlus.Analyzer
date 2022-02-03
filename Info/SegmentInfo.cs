@@ -90,16 +90,16 @@ public static class SegmentInfo
         { SegmentType.Vhdl, "VHDL\n{\n$0\n}" },
         { SegmentType.For, "For($0)\n{\n \n}" },
         { SegmentType.While, "While($0)\n{\n \n}" },
-        { SegmentType.SeqFor, "SeqFor($0)\n{\n \n}" },
+        { SegmentType.SeqFor, "SeqFor($0)\n{\n \n}" }
     };
-    
+
     private static readonly Dictionary<SegmentType, string> SnippetsParameter = new()
     {
         { SegmentType.For, "For " },
         { SegmentType.If, "If " },
         { SegmentType.Generic, "Generic\n(\n$0\n);" },
         { SegmentType.Include, "Include\n(\n$0\n);" },
-        { SegmentType.Package, "Package\n(\n$0\n);" },
+        { SegmentType.Package, "Package\n(\n$0\n);" }
     };
 
     public static string GetInfo(SegmentType type)
@@ -110,15 +110,15 @@ public static class SegmentInfo
 
     public static string GetInfoMarkdown(Segment segment)
     {
-        var words =  segment.NameOrValue.Split(' ');
+        var words = segment.NameOrValue.Split(' ');
         switch (segment.SegmentType)
         {
-            case SegmentType.Function: 
+            case SegmentType.Function:
             case SegmentType.VhdlFunction:
                 if (AnalyzerHelper.SearchFunction(segment, segment.NameOrValue.ToLower()) is { } function)
                     return FunctionInfo.GetInfoMarkdown(function);
                 return "";
-            
+
             case SegmentType.NewFunction:
                 if (AnalyzerHelper.SearchSeqFunction(segment, segment.LastName) is { } seqFunction)
                     return FunctionInfo.GetInfoMarkdown(seqFunction);
@@ -132,38 +132,29 @@ public static class SegmentInfo
                     {
                         var variable = comp.Variables[segment.NameOrValue.ToLower()];
                         var comment = GetLineCommentForSegment(variable.Owner);
-                            return $"```vhdp{PrintSegment.Convert(variable.Owner)} {comment}\n```";
+                        return $"```vhdp{PrintSegment.Convert(variable.Owner)} {comment}\n```";
                     }
                 }
+
                 return "";
             case SegmentType.NewComponent:
                 if (words.Length == 2 && segment.Context.AvailableComponents.ContainsKey(words[1].ToLower()))
-                {
                     return GetComponentInfoMarkdown(segment.Context.AvailableComponents[words[1].ToLower()]);
-                }
                 return "";
             case SegmentType.DataVariable:
             case SegmentType.VariableDeclaration:
                 DefinedVariable? dataVar = null;
                 if (segment.ConcatOperator is ".")
-                {
                     dataVar = AnalyzerHelper.SearchVariableInRecord(segment);
-                }
                 else
-                {
                     dataVar = AnalyzerHelper.SearchVariable(segment, segment.LastName);
-                }
                 if (dataVar != null)
-                {
-                    return $"```vhdp\n{(segment.SegmentType is SegmentType.VariableDeclaration ? "declaration -> " : "")}{dataVar.ToString()}\n```";
-                }
+                    return
+                        $"```vhdp\n{(segment.SegmentType is SegmentType.VariableDeclaration ? "declaration -> " : "")}{dataVar}\n```";
                 return "";
             case SegmentType.Enum:
                 var definedEnum = AnalyzerHelper.SearchEnum(segment.Context, segment.NameOrValue);
-                if (definedEnum != null)
-                {
-                    return $"```vhdp\n{segment.NameOrValue} : {definedEnum.Name}\n```";
-                }
+                if (definedEnum != null) return $"```vhdp\n{segment.NameOrValue} : {definedEnum.Name}\n```";
                 return "";
             case SegmentType.TypeUsage:
                 return segment.DataType.Description;
@@ -198,7 +189,7 @@ public static class SegmentInfo
     public static string GetSnippet(SegmentType type, bool parameter)
     {
         string? snippet;
-        if(!parameter) Snippets.TryGetValue(type, out snippet);
+        if (!parameter) Snippets.TryGetValue(type, out snippet);
         else SnippetsParameter.TryGetValue(type, out snippet);
         return snippet ?? type.ToString();
     }
@@ -206,7 +197,8 @@ public static class SegmentInfo
     public static string GetComponentInsert(Segment comp)
     {
         var str = "";
-        var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic).OrderByDescending(x => x.Value.VariableType).ToList();
+        var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
+            .OrderByDescending(x => x.Value.VariableType).ToList();
         if (list.Any())
         {
             var gap = false;
@@ -215,20 +207,19 @@ public static class SegmentInfo
             {
                 if (!gap && io.Value.VariableType is VariableType.Io)
                 {
-                    if(io.Key != list.First().Key) str += "\n";
+                    if (io.Key != list.First().Key) str += "\n";
                     gap = true;
                 }
+
                 var name = io.Value.Name;
-                for (var i = name.Length; i < minLength; i++)
-                {
-                    name += " ";
-                }
+                for (var i = name.Length; i < minLength; i++) name += " ";
                 str += "\n" + name + " => $0,";
             }
         }
+
         return $"New{comp.NameOrValue}\n({str}\n);";
     }
-    
+
     public static string GetComponentInfoMarkdown(Segment comp)
     {
         var comment = GetCommentForSegment(comp);
@@ -245,24 +236,26 @@ public static class SegmentInfo
                 var lineComment = GetLineCommentForSegment(io.Owner);
                 str += $"\n        {PrintSegment.Convert(io.Owner).Trim()}; {lineComment}";
             }
+
             str += "\n    );\n";
         }
-        
+
         foreach (var io in comp.Variables.Select(x => x.Value).Where(x => x is DefinedIo).Cast<DefinedIo>())
         {
             var lineComment = GetLineCommentForSegment(io.Owner);
             str += $"\n    {PrintSegment.Convert(io.Owner).Trim()}; {lineComment}";
         }
+
         return $"```vhdp\n{comment}New{comp.NameOrValue}\n({str}\n);\n```";
     }
 
     public static string GetCommentForSegment(Segment s)
     {
         var line = s.Context.GetLine(s.Offset);
-        var comment = s.Context.Comments.LastOrDefault(x => s.Context.GetLine(x.Range.End.Value) == line-1);
+        var comment = s.Context.Comments.LastOrDefault(x => s.Context.GetLine(x.Range.End.Value) == line - 1);
         return comment?.Comment ?? "";
     }
-    
+
     public static string GetLineCommentForSegment(Segment s)
     {
         var line = s.Context.GetLine(s.Offset);
