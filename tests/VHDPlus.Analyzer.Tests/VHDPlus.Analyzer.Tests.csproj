@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\VHDPlus.Analyzer.csproj" />
+      <ProjectReference Include="..\..\src\VHDPlus.Analyzer\VHDPlus.Analyzer.csproj" />
     </ItemGroup>
 
     <ItemGroup>
