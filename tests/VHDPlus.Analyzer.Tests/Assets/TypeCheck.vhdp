@@ -1,0 +1,39 @@
+﻿Component TypeCheck
+(
+)
+{
+    TYPE record1 IS RECORD
+    A : STD_LOGIC_VECTOR;
+    END RECORD record1;
+    TYPE record2 IS RECORD
+    B : record1;
+    END RECORD record2;
+    TYPE record3 IS RECORD
+    C : record2;
+    END RECORD record3;
+    
+    TYPE RecordArray IS ARRAY (1 downto 0) OF record3(1 DOWNTO 0);
+    TYPE VektorArray IS ARRAY (1 downto 0) OF RecordArray(1 DOWNTO 0);
+    TYPE VektorVektorArray IS ARRAY (1 downto 0) OF VektorArray(1 DOWNTO 0);
+    
+    type T_NATVEC is array (NATURAL range <>) of NATURAL;
+    
+    Process(){
+        VARIABLE test1 : T_NATVEC;
+        test1(9) := 9;
+        
+        VARIABLE test2 : record3;
+        VARIABLE test3 : RecordArray;
+        VARIABLE test4 : VektorVektorArray;
+        
+        test4(0)(0)(0).C.B.A := "1001";
+        test4(0)(0)(0).C.B.A(1) := test4(0)(0)(0).C.B.A(1);
+        test4(0)(0)(0).C.B.A(1) := '1';
+        test4(0)(0) := test3;
+        
+        VARIABLE a : UNSIGNED := "10";
+        VARIABLE b : UNSIGNED := a(0) & '1';
+        
+        VARIABLE c : BOOLEAN <= 0 < 1-1 OR true;
+    }
+}
