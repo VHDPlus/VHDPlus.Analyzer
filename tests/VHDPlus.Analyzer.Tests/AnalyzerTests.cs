@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using VHDPlus.Analyzer.Checks;
 using VHDPlus.Analyzer.Elements;
+using VHDPlus.Analyzer.Info;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -90,6 +91,13 @@ namespace VHDPlus.Analyzer.Tests
             });
         }
 
+        [Fact]
+        public void SegmentPrintTest()
+        {
+            var result = RunAnalyzer(AnalyzerMode.Full,Path.Combine(AssetsFolder, "Debug.vhdp"));
+            _output.WriteLine(PrintSegment.Convert(result.TopSegment));
+        }
+        
         [Fact]
         public void AnalyzerGetSegmentFromOffsetTest()
         {

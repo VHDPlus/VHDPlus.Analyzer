@@ -66,7 +66,7 @@ public enum SegmentType
 public class Segment : IVariableOwner
 {
     public Segment(AnalyzerContext context, Segment? parent, string nameOrValue, SegmentType segmentType,
-        DataType dataType, int offset, bool symSegment,
+        DataType dataType, int offset,
         string? concatOperator = null, int concatOperatorIndex = 0, int parameterStartIndex = 0)
     {
         Context = context;
@@ -75,7 +75,6 @@ public class Segment : IVariableOwner
         SegmentType = segmentType;
         DataType = dataType;
         Offset = offset;
-        SymSegment = symSegment;
         ConcatOperator = concatOperator;
         ConcatOperatorIndex = concatOperatorIndex;
     }
@@ -92,8 +91,8 @@ public class Segment : IVariableOwner
     public bool ConcatSegment => ConcatOperator != null;
     public string? ConcatOperator { get; set; }
     public int ConcatOperatorIndex { get; }
-    public bool SymSegment { get; } //Segment ending with ;
-    public string LastName => string.IsNullOrEmpty(NameOrValue) ? "" : NameOrValue.Split(' ').Last();
+    public bool SymSegment { get; set; } //Segment ending with ;
+    public string LastName => NameOrValue.Split(' ') is {Length: 2} s ? s[1] : "";
     public Dictionary<string, DefinedVariable> Variables { get; } = new();
 
     public override string ToString()

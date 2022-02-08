@@ -38,7 +38,7 @@ public class AnalyzerContext
     public AnalyzerContext(string filepath, string text)
     {
         FilePath = filepath;
-        TopSegment = new Segment(this, null, "GlobalScope", SegmentType.GlobalSegment, DataType.Unknown, 0, false)
+        TopSegment = new Segment(this, null, "GlobalScope", SegmentType.GlobalSegment, DataType.Unknown, 0)
         {
             EndOffset = text.Length
         };

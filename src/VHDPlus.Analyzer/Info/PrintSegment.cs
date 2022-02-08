@@ -39,6 +39,8 @@ public static class PrintSegment
             sb.Append(')');
         }
 
+        if (start.SymSegment) sb.Append(';');
+
         var noBracket = !start.Children.Any() || start.Children.First().ConcatSegment;
         if (!parameter)
             if (!start.ConcatSegment && !noBracket)
@@ -54,8 +56,7 @@ public static class PrintSegment
         {
             if (noBracket)
             {
-                if (start.SymSegment)
-                    sb.Append(";");
+                
             }
             else
             {

@@ -14,6 +14,7 @@ Main
     
     Process
     {
+        Wait(500ms);
         Pixel_reg.B <= std_logic_vector("1232");
     }
 }

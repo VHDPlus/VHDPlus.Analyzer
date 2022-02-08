@@ -114,7 +114,7 @@ public class SegmentParserContext
         var (segmentType, dataType) = ParserHelper.CheckSegment(ref value, this, Concat || parameter);
 
         var newSegment = new Segment(AnalyzerContext, CurrentSegment, value, segmentType, dataType,
-            value is "" ? CurrentIndex - 1 : CurrentInnerIndex, CurrentChar == ';',
+            value is "" ? CurrentIndex - 1 : CurrentInnerIndex,
             CurrentConcatOperator, CurrentConcatOperatorIndex);
 
         var words = value.Split(' ');
@@ -164,7 +164,7 @@ public class SegmentParserContext
             PopSegment();
             if (CurrentSegment.SegmentType is SegmentType.While && value.ToLower() is "loop") PopSegment();
             newSegment = new Segment(AnalyzerContext, CurrentSegment, "end " + value, segmentType, dataType,
-                newSegment.Offset, newSegment.SymSegment);
+                newSegment.Offset);
         }
 
         if (parameter)

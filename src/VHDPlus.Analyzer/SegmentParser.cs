@@ -154,8 +154,10 @@ public static class SegmentParser
                         if (!context.CurrentEmpty())
                         {
                             context.PushSegment();
+                            context.CurrentSegment.SymSegment = true;
                             context.PopSegment();
                         }
+                        else context.CurrentSegment.SymSegment = true;
 
                         break;
                     case '+':
@@ -238,8 +240,10 @@ public static class SegmentParser
                         if (!context.CurrentEmpty() || context.Concat)
                         {
                             context.PushSegment();
+                            context.CurrentSegment.SymSegment = true;
                             context.PopSegment();
                         }
+                        else context.CurrentSegment.SymSegment = true;
 
                         if (context.LastCharNoWhiteSpace == ')') context.PopSegment();
                         break;
@@ -315,6 +319,7 @@ public static class SegmentParser
                         break;
                     case ';':
                         context.CurrentParsePosition = ParsePosition.Body;
+                        context.CurrentSegment.SymSegment = true;
                         context.PopSegment();
                         break;
                     default:
