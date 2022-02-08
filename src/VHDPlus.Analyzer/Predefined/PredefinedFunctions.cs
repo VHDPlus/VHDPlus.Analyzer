@@ -285,6 +285,11 @@ public static class PredefinedFunctions
         { "to_bit", new[] { ToBit } },
         { "to_bitvector", new[] { ToBitVector } }
     };
+    
+    public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> StdLogicArith = new()
+    {
+        { "conv_integer", new[] { ConvInteger } },
+    };
 
     public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> MathReal = new()
     {

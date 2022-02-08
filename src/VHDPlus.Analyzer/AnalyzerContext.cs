@@ -158,6 +158,9 @@ public class AnalyzerContext
             case "ieee.std_logic_1164.all":
                 AddPackage(PredefinedFunctions.StdLogic1164, PredefinedTypes.StdLogic1164);
                 break;
+            case "ieee.std_logic_arith.all":
+                AddPackage(PredefinedFunctions.StdLogicArith, PredefinedTypes.StdLogicArith);
+                break;
         }
     }
 

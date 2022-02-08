@@ -7,6 +7,10 @@ public class PredefinedTypes
     public static readonly DataType[] StdLogic1164 =
     {
     };
+    
+    public static readonly DataType[] StdLogicArith =
+    {
+    };
 
     public static readonly DataType[] NumericStd =
     {
