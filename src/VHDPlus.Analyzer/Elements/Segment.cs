@@ -93,7 +93,6 @@ public class Segment : IVariableOwner
     public string? ConcatOperator { get; set; }
     public int ConcatOperatorIndex { get; }
     public bool SymSegment { get; } //Segment ending with ;
-
     public string LastName => string.IsNullOrEmpty(NameOrValue) ? "" : NameOrValue.Split(' ').Last();
     public Dictionary<string, DefinedVariable> Variables { get; } = new();
 

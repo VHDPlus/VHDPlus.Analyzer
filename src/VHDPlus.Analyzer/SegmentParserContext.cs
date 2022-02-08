@@ -175,6 +175,7 @@ public class SegmentParserContext
         else
         {
             CurrentSegment.Children.Add(newSegment);
+            
         }
 
         CurrentSegment = newSegment;

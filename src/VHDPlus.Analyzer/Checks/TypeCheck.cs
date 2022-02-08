@@ -5,32 +5,8 @@ namespace VHDPlus.Analyzer.Checks;
 
 public static class TypeCheck
 {
-    public static void CheckTypes(AnalyzerContext context)
-    {
-        CheckTypes(context, context.TopSegment.Children);
-    }
-
-    private static void CheckTypes(AnalyzerContext context, IEnumerable<Segment> segments)
-    {
-        foreach (var segment in segments)
-        {
-            if (segment.SegmentType is SegmentType.Vhdl) continue;
-
-            foreach (var child in segment.Children)
-                if (child.ConcatOperator != null)
-                    CheckTypePair(context, child.ConcatOperator, child, segment);
-
-            if (segment.SegmentType is SegmentType.VhdlFunction or SegmentType.NewFunction
-                or SegmentType.CustomBuiltinFunction)
-                CheckFunctionParameter(context, segment);
-
-            CheckTypes(context, segment.Children);
-
-            foreach (var par in segment.Parameter) CheckTypes(context, par);
-        }
-    }
-
-    private static void CheckFunctionParameter(AnalyzerContext context, Segment function)
+    
+    public static void CheckFunctionParameter(AnalyzerContext context, Segment function)
     {
         CustomBuiltinFunction.DefaultBuiltinFunctions.TryGetValue(function.LastName.ToLower(), out var builtin);
         IParameterOwner? func = builtin;
@@ -64,48 +40,45 @@ public static class TypeCheck
                 DiagnosticLevel.Warning, function));
     }
 
-    private static void CheckTypePair(AnalyzerContext context, string currentOperator, Segment from, Segment to)
+    public static void CheckTypePair(Segment parent, Segment child, AnalyzerContext context)
     {
+        var currentOperator = child.ConcatOperator;
         //Check types
-        if (currentOperator != "when" && currentOperator != "is" && currentOperator != "else" &&
-            currentOperator != "," &&
-            currentOperator != "and" && currentOperator != "." && currentOperator != ":" && currentOperator != "or" &&
-            currentOperator != "of" && currentOperator != "not")
+        if (currentOperator is null or "when" or "is" or "else" or "," or "and" or "." or ":" or "or" or "of" or "not") return;
+        
+        var (fD, segment) = ChildOperatorCheck(child);
+        child = segment;
+        var tD = ConvertTypeParameter(parent);
+
+        if (fD != DataType.Others && fD != DataType.Unknown && parent.DataType != DataType.Unknown &&
+            parent.DataType != DataType.Others)
         {
-            var (fD, segment) = ChildOperatorCheck(from);
-            from = segment;
-            var tD = ConvertTypeParameter(to);
+            if (!AnalyzerHelper.InParameter(child) &&
+                parent is { Parent: { }, ConcatOperator: "=" or "<" or ">" or ">=" or "<=" or "/=" } &&
+                parent.DataType == DataType.Integer
+                && (parent.Parent.DataType ==
+                    DataType.Integer ||
+                    parent.Parent.DataType == DataType.Unknown)
+                && child.ConcatOperator is not ("-" or "+"
+                    or "*" or "/"))
+                tD = DataType.Boolean;
 
-            if (fD != DataType.Others && fD != DataType.Unknown && to.DataType != DataType.Unknown &&
-                to.DataType != DataType.Others)
+            var operation = currentOperator switch
             {
-                if (!AnalyzerHelper.InParameter(from) &&
-                    to is { Parent: { }, ConcatOperator: "=" or "<" or ">" or ">=" or "<=" or "/=" } &&
-                    to.DataType == DataType.Integer
-                    && (to.Parent.DataType ==
-                        DataType.Integer ||
-                        to.Parent.DataType == DataType.Unknown)
-                    && from.ConcatOperator is not ("-" or "+"
-                        or "*" or "/"))
-                    tD = DataType.Boolean;
+                "&" => "concat",
+                "or" => "compare",
+                "and" => "compare",
+                "=" => "compare",
+                "/=" => "compare",
+                ">=" => "compare",
+                ">" => "compare",
+                "<" => "compare",
+                _ => "assign"
+            };
 
-                var operation = currentOperator switch
-                {
-                    "&" => "concat",
-                    "or" => "compare",
-                    "and" => "compare",
-                    "=" => "compare",
-                    "/=" => "compare",
-                    ">=" => "compare",
-                    ">" => "compare",
-                    "<" => "compare",
-                    _ => "assign"
-                };
-
-                if (!AnalyzerHelper.AreTypesCompatible(fD, tD, currentOperator))
-                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Cannot {operation} {fD} to {tD}",
-                        DiagnosticLevel.Warning, from));
-            }
+            if (!AnalyzerHelper.AreTypesCompatible(fD, tD, currentOperator))
+                context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Cannot {operation} {fD} to {tD}",
+                    DiagnosticLevel.Warning, child));
         }
     }
 

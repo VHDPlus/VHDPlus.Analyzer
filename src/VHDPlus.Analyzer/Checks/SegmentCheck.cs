@@ -19,51 +19,33 @@ public static class SegmentCheck
         }
     }
 
-    public static void CheckSegments(AnalyzerContext context)
+    public static void CheckSegmentPair(Segment parent, Segment child, AnalyzerContext context, bool parameter, bool thread)
     {
-        CheckSegments(context, context.TopSegment.Children);
-    }
-
-    private static void CheckSegments(AnalyzerContext context, IEnumerable<Segment> segments, bool thread = false)
-    {
-        foreach (var segment in segments)
+        if (child.SegmentType is SegmentType.Unknown || parent.SegmentType is SegmentType.Unknown || child.ConcatOperator is "," or "=>") return;
+        if (parameter)
         {
-            if (segment.SegmentType is SegmentType.Unknown or SegmentType.Vhdl) continue;
+            if (ValidSegmentsParameter[parent.SegmentType].Contains(child.SegmentType)) return;
+            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                $"Invalid Parameter Segment {child.SegmentType} at {parent.SegmentType}",
+                DiagnosticLevel.Warning, child));
+        }
+        else if (thread)
+        {
+            if (ValidSegmentsThread[parent.SegmentType].Contains(child.SegmentType)) return;
+            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                $"Invalid Segment {child.SegmentType} inside Thread at {parent.SegmentType}",
+                DiagnosticLevel.Warning, child));
+        }
+        else
+        {
+            if (ValidSegments[parent.SegmentType].Contains(child.SegmentType)) return;
 
-            foreach (var child in segment.Children)
-            {
-                if (child.SegmentType is SegmentType.Unknown) continue;
-                if (thread || segment.SegmentType is SegmentType.Thread or SegmentType.SeqFunction)
-                {
-                    if (ValidSegmentsThread[segment.SegmentType].Contains(child.SegmentType)) continue;
-                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
-                        $"Invalid Segment {child.SegmentType}  inside Thread at {segment.SegmentType}",
-                        DiagnosticLevel.Warning, child));
-                }
-                else
-                {
-                    if (ValidSegments[segment.SegmentType].Contains(child.SegmentType)) continue;
-                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
-                        $"Invalid Segment {child.SegmentType} at {segment.SegmentType}", DiagnosticLevel.Warning,
-                        child));
-                }
-            }
-
-            foreach (var parameter in segment.Parameter)
-            {
-                if (!parameter.Any()) continue;
-                if (parameter.First().SegmentType is SegmentType.Unknown) continue;
-                if (ValidSegmentsParameter[segment.SegmentType].Contains(parameter.First().SegmentType)) continue;
-                context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
-                    $"Invalid Segment {parameter.First().SegmentType} inside Parameter at {segment.SegmentType} ",
-                    DiagnosticLevel.Warning, parameter.First()));
-            }
-
-            CheckSegments(context, segment.Children,
-                thread || segment.SegmentType is SegmentType.Thread or SegmentType.SeqFunction);
+            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                $"Invalid Segment {child.SegmentType} at {parent.SegmentType}", DiagnosticLevel.Warning,
+                child));
         }
     }
-
+    
     private static IEnumerable<SegmentType> GetValidSegments(SegmentType type)
     {
         yield return SegmentType.Vhdl;
@@ -71,6 +53,10 @@ public static class SegmentCheck
 
         switch (type)
         {
+            case SegmentType.Include:
+            case SegmentType.IncludePackage:
+                yield return SegmentType.IncludePackage;
+                break;
             case SegmentType.Package:
                 yield return SegmentType.Include;
                 yield return SegmentType.VariableDeclaration;
@@ -346,6 +332,9 @@ public static class SegmentCheck
         yield return SegmentType.EmptyName;
         switch (type)
         {
+            case SegmentType.Include:
+                yield return SegmentType.IncludePackage;
+                break;
             case SegmentType.Component:
                 yield return SegmentType.Generic;
                 yield return SegmentType.Package;
@@ -427,6 +416,9 @@ public static class SegmentCheck
             case SegmentType.ComponentMember:
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.NativeDataValue;
+                break;
+            case SegmentType.Generic:
+                yield return SegmentType.VariableDeclaration;
                 break;
         }
     }

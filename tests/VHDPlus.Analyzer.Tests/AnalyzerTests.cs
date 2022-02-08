@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using VHDPlus.Analyzer.Checks;
 using VHDPlus.Analyzer.Elements;
 using Xunit;
 using Xunit.Abstractions;
@@ -77,6 +78,17 @@ namespace VHDPlus.Analyzer.Tests
                     }
             }
         }
+        
+        
+        [Fact]
+        public void CrawlTest()
+        {
+            var result = RunAnalyzer(AnalyzerMode.Full,Path.Combine(AssetsFolder, "Debug.vhdp"));
+            SegmentCrawler.GetPairs(result.TopSegment, (parent, child, parameter, thread) =>
+            {
+                _output.WriteLine($"Parent: {parent}; Child: {child}; Parameter: {parameter}; Thread: {thread}");
+            });
+        }
 
         [Fact]
         public void AnalyzerGetSegmentFromOffsetTest()
@@ -93,10 +105,21 @@ namespace VHDPlus.Analyzer.Tests
         [Fact]
         public void AnalyzerParameterTests()
         {
-            Assert.Empty(Analyzer.Analyze("","VARIABLE LED : INTEGER := (12) + (0 + (((1/10))/10)/10);", AnalyzerMode.Full).Diagnostics);
-            Assert.Empty(Analyzer.Analyze("","VARIABLE LED : INTEGER := ((12) + (0 + (((1/10))/10)/10));", AnalyzerMode.Full).Diagnostics);
-            Assert.Empty(Analyzer.Analyze("","VARIABLE LED : INTEGER := ((5) => (((5)/30)));", AnalyzerMode.Full).Diagnostics);
-            Assert.Empty(Analyzer.Analyze("","VARIABLE LED : BOOLEAN := ((true) AND false);", AnalyzerMode.Full).Diagnostics);
+            Assert.Empty(Analyzer.Analyze("","Component a (){VARIABLE LED : INTEGER := (12) + (0 + (((1/10))/10)/10);}", AnalyzerMode.Full).Diagnostics);
+            Assert.Empty(Analyzer.Analyze("","Component a (){VARIABLE LED : INTEGER := ((12) + (0 + (((1/10))/10)/10));}", AnalyzerMode.Full).Diagnostics);
+            Assert.Empty(Analyzer.Analyze("","Component a (){VARIABLE LED : INTEGER := ((5) => (((5)/30)));}", AnalyzerMode.Full).Diagnostics);
+            Assert.Empty(Analyzer.Analyze("","Component a (){VARIABLE LED : BOOLEAN := ((true) AND false);}", AnalyzerMode.Full).Diagnostics);
+        }
+        
+        [Fact]
+        public void OperatorCheckTests()
+        {
+            Assert.Empty(Analyzer.Analyze("","Component a (){Signal a : STD_LOGIC; a <= '1';}", AnalyzerMode.Full).Diagnostics);
+            Assert.Collection(Analyzer.Analyze("","Component a (){Signal a : STD_LOGIC; a := '1';}", AnalyzerMode.Full)
+                .Diagnostics, x => Assert.StartsWith("Invalid Operator", x.Message));
+            Assert.Empty(Analyzer.Analyze("","Component a (){Variable a : STD_LOGIC; a := '1';}", AnalyzerMode.Full).Diagnostics);
+            Assert.Collection(Analyzer.Analyze("","Component a (){Variable a : STD_LOGIC; a <= '1';}", AnalyzerMode.Full)
+                .Diagnostics, x => Assert.StartsWith("Invalid Operator", x.Message));
         }
 
         [Fact]

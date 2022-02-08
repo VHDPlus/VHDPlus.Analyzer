@@ -250,8 +250,16 @@ public static class Analyzer
             context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Undefined Type {s.NameOrValue}",
                 DiagnosticLevel.Warning, s));
 
-        TypeCheck.CheckTypes(context);
-        SegmentCheck.CheckSegments(context);
-        OperatorCheck.CheckSegments(context);
+
+        var constantDrivers = new Dictionary<DefinedVariable, Segment>();
+        SegmentCrawler.GetPairs(context.TopSegment, (parent, child, parameter, thread) =>
+        {
+            SegmentCheck.CheckSegmentPair(parent, child, context, parameter, thread);
+            OperatorCheck.CheckSegmentPair(parent, child, context, constantDrivers);
+            TypeCheck.CheckTypePair(parent, child, context);
+            
+            if (parent.SegmentType is SegmentType.VhdlFunction or SegmentType.NewFunction or SegmentType.CustomBuiltinFunction)
+                TypeCheck.CheckFunctionParameter(context, parent);
+        });
     }
 }
