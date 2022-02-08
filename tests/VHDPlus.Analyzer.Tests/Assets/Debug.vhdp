@@ -1,20 +1,31 @@
 Main
 (
-    Test : out STD_LOGIC := '1';
+    Package test_pack
+    (
+        Type test_type is (reset, idle, test2);
+    );
+    Generic
+    (
+        length : NATURAL := 10;
+    );
+    led: OUT STD_LOGIC := '0';
+    test : OUT STD_LOGIC_VECTOR(1 downto 0);
+    btn : IN STD_LOGIC := '0';
 )
 {
-#region test
-    TYPE Pixel_RGB_type IS RECORD
-    R : STD_LOGIC_VECTOR(7 downto 0);
-    G : STD_LOGIC_VECTOR(7 downto 0);
-    B : STD_LOGIC_VECTOR(7 downto 0);
-    END RECORD Pixel_RGB_type;
-    SIGNAL Pixel_reg : Pixel_RGB_type := (others => (others => '0'));
-#endregion
+    test(0) <= '0';
     
-    Process
+    Process()
     {
-        Wait(500ms);
-        Pixel_reg.B <= std_logic_vector("1232");
+        Thread
+        {
+            If(btn = '1')
+                led <= '0';
+            Wait(250ms);
+            led <= '1';
+            Wait(250ms);
+        }
     }
+    
+    test(1) <= '1';
 }
