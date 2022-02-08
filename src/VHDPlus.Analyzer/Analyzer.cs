@@ -8,7 +8,6 @@ public enum AnalyzerMode
 {
     Indexing,
     Resolve,
-    ErrorCheck,
     Full
 }
 
@@ -32,10 +31,8 @@ public static class Analyzer
             ResolveMissingSeqFunctions(context);
             ResolveMissingComponents(context);
             ResolveMissingSegments(context);
+            ErrorCheck(context, mode);
         }
-
-        if (mode is AnalyzerMode.Full or AnalyzerMode.ErrorCheck) ErrorCheck(context, mode);
-
         return context;
     }
 
