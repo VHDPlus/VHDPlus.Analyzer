@@ -147,7 +147,7 @@ public static class SegmentInfo
                 if (segment.ConcatOperator is ".")
                     dataVar = AnalyzerHelper.SearchVariableInRecord(segment);
                 else
-f                    dataVar = AnalyzerHelper.SearchVariable(segment, segment.NameOrValue);
+                    dataVar = AnalyzerHelper.SearchVariable(segment, segment.NameOrValue);
                 if (dataVar != null)
                     return
                         $"```vhdp\n{(segment.SegmentType is SegmentType.VariableDeclaration ? "declaration -> " : "")}{dataVar}\n```";
