@@ -17,7 +17,7 @@ public class OperatorCheck
                     {
                         IoType: IoType.Out
                     } variableEquals)
-                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                    context.Diagnostics.Add(new OperatorCheckDiagnostic(context,
                         $"Invalid Operator '=' for {variableEquals.IoType} {parent}. Cannot read from Output, use Buffer instead",
                         DiagnosticLevel.Error, child.ConcatOperatorIndex,
                         child.ConcatOperatorIndex + child.ConcatOperator.Length));
@@ -29,7 +29,7 @@ public class OperatorCheck
                     {
                         VariableType: VariableType.Io or VariableType.Signal or VariableType.RecordMember
                     } variableIo)
-                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                    context.Diagnostics.Add(new OperatorCheckDiagnostic(context,
                         $"Invalid Operator := for {variableIo.VariableType} {parent}. Use <= instead",
                         DiagnosticLevel.Error, child.ConcatOperatorIndex,
                         child.ConcatOperatorIndex + child.ConcatOperator.Length));
@@ -43,12 +43,12 @@ public class OperatorCheck
                 {
                     if (variable.VariableType is not (VariableType.Io or VariableType.Signal
                         or VariableType.Unknown))
-                        context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                        context.Diagnostics.Add(new OperatorCheckDiagnostic(context,
                             $"Invalid Operator <= for {variable.VariableType} {parent}. Use := instead",
                             DiagnosticLevel.Error, child.ConcatOperatorIndex,
                             child.ConcatOperatorIndex + child.ConcatOperator.Length));
                     else if (variable is DefinedIo { IoType: IoType.In })
-                        context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                        context.Diagnostics.Add(new OperatorCheckDiagnostic(context,
                             $"Invalid Operator <= for {variable.VariableType} {parent}. Cannot assign a value to an input",
                             DiagnosticLevel.Error, child.ConcatOperatorIndex,
                             child.ConcatOperatorIndex + child.ConcatOperator.Length));
@@ -63,7 +63,7 @@ public class OperatorCheck
                                 if ((constantDrivers[variable] != topLevel ||
                                      topLevel.SegmentType is not SegmentType.Process) &&
                                     AnalyzerHelper.SearchTopSegment(parent, SegmentType.Generate) == null)
-                                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                                    context.Diagnostics.Add(new OperatorCheckDiagnostic(context,
                                         $"Multiple constant drivers for {parent}. You can only drive a signal from one process",
                                         DiagnosticLevel.Error, child.ConcatOperatorIndex,
                                         child.ConcatOperatorIndex + child.ConcatOperator.Length));

@@ -21,7 +21,7 @@ public static class TypeCheck
             {
                 var (fD, segment) = ChildOperatorCheck(funcPar);
                 if (fD != DataType.Unknown && !AnalyzerHelper.AreTypesCompatible(fD, func.Parameters[i].DataType, "="))
-                    context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                    context.Diagnostics.Add(new TypeCheckDiagnostic(context,
                         $"Invalid Parameter of type {fD}. Expected {func.Parameters[i].DataType}",
                         DiagnosticLevel.Error, funcPar));
             }
@@ -77,7 +77,7 @@ public static class TypeCheck
             };
 
             if (!AnalyzerHelper.AreTypesCompatible(fD, tD, currentOperator))
-                context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Cannot {operation} {fD} to {tD}",
+                context.Diagnostics.Add(new TypeCheckDiagnostic(context, $"Cannot {operation} {fD} to {tD}",
                     DiagnosticLevel.Warning, child));
         }
     }

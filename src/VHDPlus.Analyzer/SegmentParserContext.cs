@@ -198,14 +198,14 @@ public class SegmentParserContext
     public void PopSegment()
     {
         if (!CurrentEmpty() && CurrentSegment.SegmentType != SegmentType.Connections)
-            AnalyzerContext.Diagnostics.Add(new GenericAnalyzerDiagnostic(this, "Unexpected input",
+            AnalyzerContext.Diagnostics.Add(new SegmentParserDiagnostic(this, "Unexpected input",
                 DiagnosticLevel.Warning));
 
         PopTempBlocks();
 
         if (!PopBlock())
             AnalyzerContext.Diagnostics.Add(
-                new GenericAnalyzerDiagnostic(this, "Unexpected end", DiagnosticLevel.Error));
+                new SegmentParserDiagnostic(this, "Unexpected end", DiagnosticLevel.Error));
 
         ClearCurrent();
     }

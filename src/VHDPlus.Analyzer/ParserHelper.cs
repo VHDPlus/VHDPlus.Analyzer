@@ -117,7 +117,7 @@ public static class ParserHelper
                         }
                         else
                         {
-                            context.AnalyzerContext.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                            context.AnalyzerContext.Diagnostics.Add(new SegmentParserDiagnostic(context,
                                 "Type " + ownerWords[1] + " is defined twice!", DiagnosticLevel.Error));
                         }
                     }
@@ -454,9 +454,9 @@ public static class ParserHelper
                 }
                 else
                 {
-                    context.AnalyzerContext.Diagnostics.Add(new GenericAnalyzerDiagnostic(context.AnalyzerContext,
+                    context.AnalyzerContext.Diagnostics.Add(new SegmentParserDiagnostic(context.AnalyzerContext,
                         $"{variableType} {varName} already defined in {variableOwner}", DiagnosticLevel.Error, off,
-                        off + varName.Length));
+                        off + varName.Length)); //TODO move outside of segment parser
                 }
             }
         }

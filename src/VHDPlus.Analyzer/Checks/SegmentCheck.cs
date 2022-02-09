@@ -25,14 +25,14 @@ public static class SegmentCheck
         if (parameter)
         {
             if (ValidSegmentsParameter[parent.SegmentType].Contains(child.SegmentType)) return;
-            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+            context.Diagnostics.Add(new SegmentCheckDiagnostic(context,
                 $"Invalid Parameter Segment {child.SegmentType} at {parent.SegmentType}",
                 DiagnosticLevel.Warning, child));
         }
         else if (thread)
         {
             if (ValidSegmentsThread[parent.SegmentType].Contains(child.SegmentType)) return;
-            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+            context.Diagnostics.Add(new SegmentCheckDiagnostic(context,
                 $"Invalid Segment {child.SegmentType} inside Thread at {parent.SegmentType}",
                 DiagnosticLevel.Warning, child));
         }
@@ -40,7 +40,7 @@ public static class SegmentCheck
         {
             if (ValidSegments[parent.SegmentType].Contains(child.SegmentType)) return;
 
-            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+            context.Diagnostics.Add(new SegmentCheckDiagnostic(context,
                 $"Invalid Segment {child.SegmentType} at {parent.SegmentType}", DiagnosticLevel.Warning,
                 child));
         }

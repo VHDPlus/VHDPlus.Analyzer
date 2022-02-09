@@ -24,6 +24,12 @@ public static class Analyzer
     {
         if (pC != null) context.AddProjectContext(pC);
 
+        //Filter out all diagnostics that are not from segment parsing
+        var segmentParserDiagnostics = context.Diagnostics
+            .Where(x => x is SegmentParserDiagnostic).ToList();
+        context.Diagnostics.Clear();
+        context.Diagnostics.AddRange(segmentParserDiagnostics);
+
         context.ResolveIncludes();
         ResolveMissingTypes(context, context.AvailableTypes);
         if (mode is AnalyzerMode.Full or AnalyzerMode.Resolve)
@@ -199,10 +205,10 @@ public static class Analyzer
                                                 seqVariable.Value.DataType, seqVariable.Value.VariableType,
                                                 context.UnresolvedSeqFunctions[i].Offset));
                                     else
-                                        context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context,
+                                        context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, 
                                             $"{newName} already defined in {variableOwner}", DiagnosticLevel.Error,
                                             funcPar.Offset,
-                                            funcPar.Offset + newName.Length));
+                                            funcPar.Offset + newName.Length)); //TODO change diagnostic type
                                     break;
                                 }
 
@@ -232,19 +238,19 @@ public static class Analyzer
     private static void ErrorCheck(AnalyzerContext context, AnalyzerMode mode)
     {
         foreach (var s in context.UnresolvedSegments)
-            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Undefined Variable {s.NameOrValue}",
+            context.Diagnostics.Add(new MissingComponentDiagnostic(context, $"Undefined Variable {s.NameOrValue}",
                 DiagnosticLevel.Error, s));
 
         foreach (var s in context.UnresolvedComponents)
-            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Undefined Component {s.LastName}",
+            context.Diagnostics.Add(new MissingComponentDiagnostic(context, $"Undefined Component {s.LastName}",
                 DiagnosticLevel.Error, s));
 
         foreach (var s in context.UnresolvedSeqFunctions)
-            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Undefined SeqFunction {s.LastName}",
+            context.Diagnostics.Add(new MissingComponentDiagnostic(context, $"Undefined SeqFunction {s.LastName}",
                 DiagnosticLevel.Error, s));
 
         foreach (var s in context.UnresolvedTypes)
-            context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, $"Undefined Type {s.NameOrValue}",
+            context.Diagnostics.Add(new MissingComponentDiagnostic(context, $"Undefined Type {s.NameOrValue}",
                 DiagnosticLevel.Warning, s));
 
 
