@@ -79,8 +79,8 @@ public static class SegmentInfo
     private static readonly Dictionary<SegmentType, string> Snippets = new()
     {
         { SegmentType.Main, "Main\n(\n$0\n)\n{\n \n}" },
-        { SegmentType.Package, "Package\n(\n$0\n)\n{\n \n}" },
-        { SegmentType.Component, "Component\n(\n$0\n)\n{\n \n}" },
+        { SegmentType.Package, "Package ´name´$0\n(\n\n)\n{\n \n}" },
+        { SegmentType.Component, "Component ´name´$0\n(\n\n)\n{\n \n}" },
         { SegmentType.Generate, "Generate($0)\n{\n \n}" },
         { SegmentType.Thread, "Thread\n{\n$0\n}" },
         { SegmentType.Process, "Process()\n{\n$0\n}" },
@@ -99,7 +99,7 @@ public static class SegmentInfo
         { SegmentType.If, "If " },
         { SegmentType.Generic, "Generic\n(\n$0\n);" },
         { SegmentType.Include, "Include\n(\n$0\n);" },
-        { SegmentType.Package, "Package\n(\n$0\n);" }
+        { SegmentType.Package, "Package ´name´$0\n(\n\n);" }
     };
 
     public static string GetInfo(SegmentType type)
