@@ -83,7 +83,7 @@ public static class SegmentInfo
         { SegmentType.Component, "Component\n(\n$0\n)\n{\n \n}" },
         { SegmentType.Generate, "Generate($0)\n{\n \n}" },
         { SegmentType.Thread, "Thread\n{\n$0\n}" },
-        { SegmentType.Process, "Process\n{\n$0\n}" },
+        { SegmentType.Process, "Process()\n{\n$0\n}" },
         { SegmentType.If, "If($0)" },
         { SegmentType.Elsif, "Elsif($0)" },
         { SegmentType.Else, "Else" },
