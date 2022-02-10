@@ -404,7 +404,7 @@ public static class ParserHelper
             if (variableOwner is Segment { SegmentType: SegmentType.SeqFunction } seqFunc &&
                 AnalyzerHelper.SearchSeqFunction(context.CurrentSegment, seqFunc.LastName.ToLower()) is { } seqOwner)
             {
-                if (context.CurrentParsePosition is ParsePosition.Parameter) variableType = VariableType.Signal;
+                if (context.CurrentParsePosition is ParsePosition.Parameter && variableType is VariableType.Unknown) variableType = VariableType.Signal;
                 var variable = new DefinedVariable(segment, varName, dataType, variableType, context.CurrentIndex);
 
                 if (!variableOwner.Variables.ContainsKey(varName.ToLower()))
