@@ -4,12 +4,12 @@ using VHDPlus.Analyzer.Elements;
 
 namespace VHDPlus.Analyzer;
 
+[Flags]
 public enum AnalyzerMode
 {
     Indexing,
     Resolve,
     Check,
-    Full
 }
 
 public static class Analyzer
@@ -18,29 +18,30 @@ public static class Analyzer
     {
         var context = SegmentParser.Parse(path, content);
 
-        return mode is AnalyzerMode.Indexing ? context : Analyze(context, mode, pC);
+        return Analyze(context, mode, pC);
     }
 
     public static AnalyzerContext Analyze(AnalyzerContext context, AnalyzerMode mode, ProjectContext? pC)
     {
         if (pC != null) context.AddProjectContext(pC);
 
-        //Filter out all diagnostics that are not from segment parsing
-        context.Diagnostics.RemoveAll(x => x is not (SegmentParserDiagnostic or ResolveDiagnostic));
-        
-        if(mode is AnalyzerMode.Full or AnalyzerMode.Resolve) 
+        if (mode.HasFlag(AnalyzerMode.Resolve) || mode.HasFlag(AnalyzerMode.Check))
+        {
+            //Filter out all diagnostics that are not from segment parsing 
+            context.Diagnostics.RemoveAll(x => x is not (SegmentParserDiagnostic or ResolveDiagnostic));
+        }
+
+        if (mode.HasFlag(AnalyzerMode.Resolve))
+        {
             context.Diagnostics.RemoveAll(x => x is ResolveDiagnostic);
 
-        context.ResolveIncludes();
-        ResolveMissingTypes(context, context.AvailableTypes);
-        if (mode is AnalyzerMode.Full or AnalyzerMode.Resolve)
-        {
+            context.ResolveIncludes();
+            ResolveMissingTypes(context, context.AvailableTypes);
             ResolveMissingSeqFunctions(context);
             ResolveMissingComponents(context);
             ResolveMissingSegments(context);
         }
-
-        if (mode is AnalyzerMode.Check or AnalyzerMode.Full)
+        if (mode.HasFlag(AnalyzerMode.Check))
         {
             ErrorCheck(context);
         }
