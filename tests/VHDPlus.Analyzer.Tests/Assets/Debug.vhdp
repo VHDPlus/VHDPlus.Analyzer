@@ -1,31 +1,13 @@
-Main
+Component test_comp
 (
-    Package test_pack
-    (
-        Type test_type is (reset, idle, test2);
-    );
     Generic
     (
-        length : NATURAL := 10;
+        test_1 : NATURAL := 1;
+        test_2 : NATURAL := 2;
     );
-    led: OUT STD_LOGIC := '0';
-    test : OUT STD_LOGIC_VECTOR(1 downto 0);
-    btn : IN STD_LOGIC := '0';
+    test_3 : IN STD_LOGIC; 
+    test_4 : OUT STD_LOGIC;
 )
 {
-    test(0) <= '0';
     
-    Process()
-    {
-        Thread
-        {
-            If(btn = '1')
-                led <= '0';
-            Wait(250ms);
-            led <= '1';
-            Wait(250ms);
-        }
-    }
-    
-    test(1) <= '1';
 }

@@ -67,7 +67,7 @@ public class Segment : IVariableOwner
 {
     public Segment(AnalyzerContext context, Segment? parent, string nameOrValue, SegmentType segmentType,
         DataType dataType, int offset,
-        string? concatOperator = null, int concatOperatorIndex = 0, int parameterStartIndex = 0)
+        string? concatOperator = null, int concatOperatorIndex = 0)
     {
         Context = context;
         Parent = parent;
