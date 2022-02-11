@@ -64,7 +64,7 @@ public static class ParserHelper
         if (name == "")
         {
             if (context.CurrentConcatOperator is "is" &&
-                context.CurrentSegment.SegmentType == SegmentType.Type)
+                context.CurrentSegment.SegmentType is SegmentType.Type or SegmentType.SubType)
             {
                 var enumName = context.CurrentSegment.NameOrValue.Split(' ',
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Last();
@@ -101,7 +101,7 @@ public static class ParserHelper
             case SegmentType.Record:
             case SegmentType.Array:
                 if (context.CurrentConcatOperator is "is" && context.CurrentSegment is
-                        { SegmentType: SegmentType.Type })
+                        { SegmentType: SegmentType.Type or SegmentType.SubType })
                 {
                     var ownerWords = context.CurrentSegment.NameOrValue.Split(' ');
                     if (ownerWords.Length == 2)
@@ -244,7 +244,7 @@ public static class ParserHelper
                 {
                     var topEnum = AnalyzerHelper.SearchTopSegment(context.CurrentSegment, SegmentType.EnumDeclaration)
                         ?.Parent;
-                    if (topEnum is { SegmentType: SegmentType.Type })
+                    if (topEnum is { SegmentType: SegmentType.Type or SegmentType.SubType })
                     {
                         var enumName = topEnum.NameOrValue.Split(' ').Last().ToLower();
                         if (context.AnalyzerContext.AvailableTypes.ContainsKey(enumName) &&
@@ -340,7 +340,7 @@ public static class ParserHelper
     {
         var dataType = GetDeclaredDataType(context.AnalyzerContext, name);
         if (AnalyzerHelper.SearchTopSegment(context.CurrentSegment, SegmentType.Array) is
-            { Parent: { SegmentType: SegmentType.Type } } array)
+            { Parent: { SegmentType: SegmentType.Type or SegmentType.SubType } } array)
         {
             var typeName = array.Parent?.NameOrValue.Split(' ').Last().ToLower() ?? string.Empty;
             if (context.AnalyzerContext.AvailableTypes.ContainsKey(typeName) &&
@@ -471,7 +471,7 @@ public static class ParserHelper
         IVariableOwner variableOwner = segment;
 
         if (AnalyzerHelper.SearchTopSegment(segment, SegmentType.Record) is
-            { Parent: { SegmentType: SegmentType.Type } } record)
+            { Parent: { SegmentType: SegmentType.Type or SegmentType.SubType } } record)
         {
             var typeName = record.Parent?.NameOrValue.Split(' ').Last().ToLower() ?? string.Empty;
             if (types.TryGetValue(typeName, out var dt) && dt is CustomDefinedRecord cRecord)

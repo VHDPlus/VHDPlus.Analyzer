@@ -61,6 +61,7 @@ public static class SegmentCheck
                 yield return SegmentType.Include;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.Type;
+                yield return SegmentType.SubType;
                 yield return SegmentType.SeqFunction;
                 yield return SegmentType.VhdlEnd;
                 yield return SegmentType.Vhdl;
@@ -68,6 +69,7 @@ public static class SegmentCheck
             case SegmentType.AttributeDeclaration:
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.Type;
+                yield return SegmentType.SubType;
                 yield return SegmentType.Function;
                 yield return SegmentType.Vhdl;
                 break;
@@ -80,6 +82,7 @@ public static class SegmentCheck
             case SegmentType.Component:
             case SegmentType.Generate:
                 yield return SegmentType.Type;
+                yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.Function;
@@ -100,6 +103,7 @@ public static class SegmentCheck
                 yield return SegmentType.Else;
                 yield return SegmentType.Case;
                 yield return SegmentType.Type;
+                yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.Return;
@@ -121,6 +125,7 @@ public static class SegmentCheck
                 yield return SegmentType.Else;
                 yield return SegmentType.Case;
                 yield return SegmentType.Type;
+                yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.Function;
@@ -185,6 +190,7 @@ public static class SegmentCheck
                 yield return SegmentType.Else;
                 yield return SegmentType.Case;
                 yield return SegmentType.Type;
+                yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.Function;
@@ -222,6 +228,7 @@ public static class SegmentCheck
                 yield return SegmentType.Else;
                 yield return SegmentType.Case;
                 yield return SegmentType.Type;
+                yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.Return;
@@ -348,6 +355,7 @@ public static class SegmentCheck
                 break;
             case SegmentType.Package:
                 yield return SegmentType.Type;
+                yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
                 break;
             case SegmentType.Function:

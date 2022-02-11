@@ -84,8 +84,11 @@ public class AnalyzerContext
 
     public void AddLocalType(string key, DataType type)
     {
-        _types.Add(key, type);
-        _availableTypes.Add(key, type);
+        //Todo add duplicate type list
+        if(!_types.ContainsKey(key))
+            _types.Add(key, type);
+        if(!_availableTypes.ContainsKey(key)) 
+            _availableTypes.Add(key, type);
     }
 
     public void AddLocalFunction(string key, CustomDefinedFunction func)

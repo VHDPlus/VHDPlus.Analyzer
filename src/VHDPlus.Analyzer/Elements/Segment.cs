@@ -21,6 +21,7 @@ public enum SegmentType
     Null,
     TypeUsage,
     Type,
+    SubType,
     Connections,
     ConnectionsMember,
     Step,
