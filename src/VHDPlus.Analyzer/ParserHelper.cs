@@ -64,12 +64,13 @@ public static class ParserHelper
         if (name == "")
         {
             if (context.CurrentConcatOperator is "is" &&
-                context.CurrentSegment.SegmentType is SegmentType.Type or SegmentType.SubType)
+                context.CurrentSegment.SegmentType is SegmentType.Type)
             {
                 var enumName = context.CurrentSegment.NameOrValue.Split(' ',
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Last();
-                //Create enum
-                context.AnalyzerContext.AddLocalType(enumName.ToLower(), new CustomDefinedEnum(enumName));
+                
+                context.AnalyzerContext.AddLocalType(enumName.ToLower(), new CustomDefinedEnum(enumName), context.CurrentSegment);
+               
                 return (SegmentType.EnumDeclaration, DataType.Unknown);
             }
 
@@ -106,20 +107,8 @@ public static class ParserHelper
                     var ownerWords = context.CurrentSegment.NameOrValue.Split(' ');
                     if (ownerWords.Length == 2)
                     {
-                        if (!context.AnalyzerContext.AvailableTypes.ContainsKey(ownerWords[1]))
-                        {
-                            if (type is SegmentType.Record)
-                                context.AnalyzerContext.AddLocalType(ownerWords[1].ToLower(),
-                                    new CustomDefinedRecord(ownerWords[1]));
-                            else
-                                context.AnalyzerContext.AddLocalType(ownerWords[1].ToLower(),
-                                    new CustomDefinedArray(ownerWords[1]));
-                        }
-                        else
-                        {
-                            context.AnalyzerContext.Diagnostics.Add(new SegmentParserDiagnostic(context,
-                                "Type " + ownerWords[1] + " is defined twice!", DiagnosticLevel.Error));
-                        }
+                        context.AnalyzerContext.AddLocalType(ownerWords[1].ToLower(),
+                            type is SegmentType.Record ? new CustomDefinedRecord(ownerWords[1]) : new CustomDefinedArray(ownerWords[1]), context.CurrentSegment);
                     }
                 }
 
@@ -303,6 +292,10 @@ public static class ParserHelper
                 else if (words.First() is "wait") //For GHDP
                 {
                     return (SegmentType.VhdlFunction, DataType.Unknown);
+                }
+                else if (context.CurrentSegment.SegmentType is SegmentType.SubType && context.CurrentConcatOperator is "is")
+                {
+                    return (SegmentType.TypeUsage, DataType.Unknown);
                 }
                 else
                 {

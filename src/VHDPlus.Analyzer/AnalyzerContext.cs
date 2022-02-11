@@ -82,13 +82,19 @@ public class AnalyzerContext
         return Comments.Any(c => offset >= c.Range.Start.Value && offset <= c.Range.End.Value);
     }
 
-    public void AddLocalType(string key, DataType type)
+    public void AddLocalType(string key, DataType type, Segment owner)
     {
-        //Todo add duplicate type list
-        if(!_types.ContainsKey(key))
+        if(!AvailableTypes.ContainsKey(key))
+        {
             _types.Add(key, type);
-        if(!_availableTypes.ContainsKey(key)) 
             _availableTypes.Add(key, type);
+        }
+        else
+        {
+            Diagnostics.Add(
+                new SegmentParserDiagnostic(this, $"Type {key} is already defined!", 
+                    DiagnosticLevel.Error, owner));
+        }
     }
 
     public void AddLocalFunction(string key, CustomDefinedFunction func)

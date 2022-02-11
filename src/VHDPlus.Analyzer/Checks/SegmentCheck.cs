@@ -210,6 +210,13 @@ public static class SegmentCheck
             case SegmentType.ConnectionsMember:
                 yield return SegmentType.ConnectionsMember;
                 break;
+            case SegmentType.Range:
+                yield return SegmentType.NativeDataValue;
+                yield return SegmentType.DataVariable;
+                break;
+            case SegmentType.SubType:
+                yield return SegmentType.TypeUsage;
+                break;
         }
     }
 
@@ -331,6 +338,13 @@ public static class SegmentCheck
                 yield return SegmentType.FunctionContent;
                 yield return SegmentType.NewFunction;
                 break;
+            case SegmentType.Range:
+                yield return SegmentType.NativeDataValue;
+                yield return SegmentType.DataVariable;
+                break;
+            case SegmentType.SubType:
+                yield return SegmentType.TypeUsage;
+                break;
         }
     }
 
@@ -427,6 +441,13 @@ public static class SegmentCheck
                 break;
             case SegmentType.Generic:
                 yield return SegmentType.VariableDeclaration;
+                break;
+            case SegmentType.Range:
+                yield return SegmentType.NativeDataValue;
+                yield return SegmentType.DataVariable;
+                break;
+            case SegmentType.SubType:
+                yield return SegmentType.TypeUsage;
                 break;
         }
     }
