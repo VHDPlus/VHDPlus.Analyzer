@@ -8,6 +8,7 @@ public enum AnalyzerMode
 {
     Indexing,
     Resolve,
+    Check,
     Full
 }
 
@@ -17,7 +18,7 @@ public static class Analyzer
     {
         var context = SegmentParser.Parse(path, content);
 
-        return Analyze(context, mode, pC);
+        return mode is AnalyzerMode.Indexing ? context : Analyze(context, mode, pC);
     }
 
     public static AnalyzerContext Analyze(AnalyzerContext context, AnalyzerMode mode, ProjectContext? pC)
@@ -25,10 +26,10 @@ public static class Analyzer
         if (pC != null) context.AddProjectContext(pC);
 
         //Filter out all diagnostics that are not from segment parsing
-        var segmentParserDiagnostics = context.Diagnostics
-            .Where(x => x is SegmentParserDiagnostic).ToList();
-        context.Diagnostics.Clear();
-        context.Diagnostics.AddRange(segmentParserDiagnostics);
+        context.Diagnostics.RemoveAll(x => x is not (SegmentParserDiagnostic or ResolveDiagnostic));
+        
+        if(mode is AnalyzerMode.Full or AnalyzerMode.Resolve) 
+            context.Diagnostics.RemoveAll(x => x is ResolveDiagnostic);
 
         context.ResolveIncludes();
         ResolveMissingTypes(context, context.AvailableTypes);
@@ -37,7 +38,11 @@ public static class Analyzer
             ResolveMissingSeqFunctions(context);
             ResolveMissingComponents(context);
             ResolveMissingSegments(context);
-            ErrorCheck(context, mode);
+        }
+
+        if (mode is AnalyzerMode.Check or AnalyzerMode.Full)
+        {
+            ErrorCheck(context);
         }
         return context;
     }
@@ -205,7 +210,7 @@ public static class Analyzer
                                                 seqVariable.Value.DataType, seqVariable.Value.VariableType,
                                                 context.UnresolvedSeqFunctions[i].Offset));
                                     else
-                                        context.Diagnostics.Add(new GenericAnalyzerDiagnostic(context, 
+                                        context.Diagnostics.Add(new ResolveDiagnostic(context, 
                                             $"{newName} already defined in {variableOwner}", DiagnosticLevel.Error,
                                             funcPar.Offset,
                                             funcPar.Offset + newName.Length)); //TODO change diagnostic type
@@ -235,7 +240,7 @@ public static class Analyzer
             }
     }
 
-    private static void ErrorCheck(AnalyzerContext context, AnalyzerMode mode)
+    private static void ErrorCheck(AnalyzerContext context)
     {
         foreach (var s in context.UnresolvedSegments)
             context.Diagnostics.Add(new MissingComponentDiagnostic(context, $"Undefined Variable {s.NameOrValue}",
