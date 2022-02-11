@@ -62,7 +62,7 @@ public class OperatorCheck
                             {
                                 if ((constantDrivers[variable] != topLevel ||
                                      topLevel.SegmentType is not SegmentType.Process) &&
-                                    AnalyzerHelper.SearchTopSegment(parent, SegmentType.Generate) == null)
+                                    AnalyzerHelper.SearchTopSegment(parent, SegmentType.Generate, SegmentType.SeqFunction) == null)
                                     context.Diagnostics.Add(new OperatorCheckDiagnostic(context,
                                         $"Multiple constant drivers for {parent}. You can only drive a signal from one process",
                                         DiagnosticLevel.Error, child.ConcatOperatorIndex,

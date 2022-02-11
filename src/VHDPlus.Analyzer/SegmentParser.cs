@@ -386,7 +386,7 @@ public static class SegmentParser
                 }
 
                 {
-                    if (lastWord is "select" or "range")
+                    if (lastWord is "select" || lastWord is "range" && context.CurrentSegment.SegmentType is SegmentType.SubType)
                     {
                         context.CurrentInner.Remove(context.CurrentInner.Length - lastWord.Length,
                             lastWord.Length);
