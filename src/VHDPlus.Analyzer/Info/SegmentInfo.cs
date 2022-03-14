@@ -234,7 +234,7 @@ public static class SegmentInfo
             foreach (var io in generics)
             {
                 var lineComment = GetLineCommentForSegment(io.Owner);
-                str += $"\n        {PrintSegment.Convert(io.Owner).Trim()}; {lineComment}";
+                str += $"\n        {PrintSegment.Convert(io.Owner).Trim()} {lineComment}";
             }
 
             str += "\n    );\n";
@@ -243,7 +243,7 @@ public static class SegmentInfo
         foreach (var io in comp.Variables.Select(x => x.Value).Where(x => x is DefinedIo).Cast<DefinedIo>())
         {
             var lineComment = GetLineCommentForSegment(io.Owner);
-            str += $"\n    {PrintSegment.Convert(io.Owner).Trim()}; {lineComment}";
+            str += $"\n    {PrintSegment.Convert(io.Owner).Trim()} {lineComment}";
         }
 
         return $"```vhdp\n{comment}New{comp.NameOrValue}\n({str}\n);\n```";
