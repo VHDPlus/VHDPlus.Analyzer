@@ -127,9 +127,9 @@ public static class Analyzer
     {
         for (var i = 0; i < context.UnresolvedSegments.Count; i++)
         {
-            var variable = AnalyzerHelper.SearchVariable(context.UnresolvedSegments[i],
-                               context.UnresolvedSegments[i].NameOrValue) ??
-                           AnalyzerHelper.SearchVariableInRecord(context.UnresolvedSegments[i]);
+            var variable = context.UnresolvedSegments[i].ConcatOperator is "." ? AnalyzerHelper.SearchVariableInRecord(context.UnresolvedSegments[i]) : 
+                    AnalyzerHelper.SearchVariable(context.UnresolvedSegments[i], context.UnresolvedSegments[i].NameOrValue);
+            
             if (variable == null &&
                 context.AvailableExposingVariables.ContainsKey(context.UnresolvedSegments[i].NameOrValue.ToLower()))
                 variable = context.AvailableExposingVariables[context.UnresolvedSegments[i].NameOrValue.ToLower()];
