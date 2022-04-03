@@ -121,7 +121,7 @@ public class SegmentParserContext
 
         switch (segmentType)
         {
-            case SegmentType.Unknown when CurrentChar is not ':':
+            case SegmentType.Unknown when CurrentChar is not ':' || NextChar is '=':
             case SegmentType.DataVariable when dataType == DataType.Unknown:
                 AnalyzerContext.UnresolvedSegments.Add(newSegment);
                 break;
