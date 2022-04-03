@@ -150,7 +150,7 @@ public static class SegmentInfo
                     dataVar = AnalyzerHelper.SearchVariable(segment, segment.NameOrValue);
                 if (dataVar != null)
                     return
-                        $"```vhdp\n{(segment.SegmentType is SegmentType.VariableDeclaration ? "declaration -> " : "")}{dataVar}\n```";
+                        $"```vhdp\n{(segment.SegmentType is SegmentType.VariableDeclaration ? "declaration -> " : "")}{PrintSegment.Convert(dataVar.Owner).Trim()}\n```";
                 return "";
             case SegmentType.Enum:
                 var definedEnum = AnalyzerHelper.SearchEnum(segment.Context, segment.NameOrValue);

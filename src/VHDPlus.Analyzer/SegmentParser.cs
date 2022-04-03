@@ -26,6 +26,7 @@ public static class SegmentParser
             switch (context.CurrentChar) //Detect comments and newline
             {
                 case '\n':
+                case '\r':
                     if (lineComment)
                         aC.Comments.Add(new FileComment(new Range(lineCommentStartOffset, context.CurrentIndex - 1),
                             content[lineCommentStartOffset..(context.CurrentIndex - 1)]));
