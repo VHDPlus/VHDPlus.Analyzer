@@ -154,6 +154,7 @@ public static class SegmentCheck
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.VhdlFunction;
                 yield return SegmentType.VhdlAttribute;
+                yield return SegmentType.Range;
                 yield return SegmentType.None;
                 break;
             case SegmentType.EmptyName:
@@ -264,6 +265,7 @@ public static class SegmentCheck
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.VhdlFunction;
                 yield return SegmentType.VhdlAttribute;
+                yield return SegmentType.Range;
                 break;
             case SegmentType.EmptyName:
                 yield return SegmentType.NativeDataValue;
@@ -448,6 +450,9 @@ public static class SegmentCheck
                 break;
             case SegmentType.SubType:
                 yield return SegmentType.TypeUsage;
+                break;
+            case SegmentType.ParFor:
+                yield return SegmentType.DataVariable;
                 break;
         }
     }
