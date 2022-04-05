@@ -56,6 +56,7 @@ public class AnalyzerContext
 
         ResolveInclude("ieee.numeric_std.all");
         ResolveInclude("ieee.std_logic_1164.all");
+        ResolveInclude("ieee.math_real.all");
     }
 
     public IEnumerable<Segment> TopLevels => TopSegment.Children;
