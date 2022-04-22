@@ -87,6 +87,8 @@ public static class SegmentInfo
         { SegmentType.If, "If($0)" },
         { SegmentType.Elsif, "Elsif($0)" },
         { SegmentType.Else, "Else" },
+        { SegmentType.Case, "Case($0)" },
+        { SegmentType.When, "When($0)" },
         { SegmentType.Vhdl, "VHDL\n{\n$0\n}" },
         { SegmentType.For, "For($0)\n{\n \n}" },
         { SegmentType.While, "While($0)\n{\n \n}" },
