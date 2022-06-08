@@ -29,6 +29,19 @@ public static class FunctionInfo
         str += ")\n```";
         return str;
     }
+    
+    public static string GetInfoMarkdown(CustomBuiltinFunction function)
+    {
+        var str = $"```vhdp\n{function.Name}(";
+        foreach (var par in function.Parameters)
+        {
+            str += $"{par.Name} : {par.DataType}";
+            if (par != function.Parameters.Last()) str += ", ";
+        }
+
+        str += $")\n```\n{function.Description}";
+        return str;
+    }
 
     public static string GetInsert(CustomDefinedFunction function)
     {

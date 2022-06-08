@@ -121,6 +121,13 @@ public static class SegmentInfo
                     return FunctionInfo.GetInfoMarkdown(function);
                 return "";
 
+            case SegmentType.CustomBuiltinFunction:
+                if (CustomBuiltinFunction.DefaultBuiltinFunctions.ContainsKey(segment.NameOrValue.ToLower()))
+                {
+                    var func = CustomBuiltinFunction.DefaultBuiltinFunctions[segment.NameOrValue.ToLower()];
+                    return FunctionInfo.GetInfoMarkdown(func);
+                }
+                return "";
             case SegmentType.NewFunction:
                 if (AnalyzerHelper.SearchSeqFunction(segment, segment.LastName) is { } seqFunction)
                     return FunctionInfo.GetInfoMarkdown(seqFunction);
