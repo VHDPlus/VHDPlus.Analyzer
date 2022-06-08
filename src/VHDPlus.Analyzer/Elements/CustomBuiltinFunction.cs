@@ -4,7 +4,7 @@ public class CustomBuiltinFunction : IParameterOwner
 {
     private static readonly CustomBuiltinFunction Wait =
         new("Wait",
-            "Delays two operations by a given number of CLK cycles (use the wait calculator to calculate the cycles")
+            "Delays two operations by a given number of CLK cycles\n\nFor 12MHz clocks you can use time units (e.g. 10ms, 100ns)")
         {
             Parameters = { new FunctionParameter("timespan", DataType.Integer) }
         };
