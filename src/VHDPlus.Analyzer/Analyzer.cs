@@ -72,6 +72,10 @@ public static class Analyzer
             if (!customTypes.ContainsKey(context.UnresolvedTypes[i].NameOrValue.ToLower())) continue;
             context.UnresolvedTypes[i].DataType = customTypes[context.UnresolvedTypes[i].NameOrValue.ToLower()];
             context.UnresolvedTypes[i].SegmentType = SegmentType.TypeUsage;
+            if(context.UnresolvedTypes[i].Parent is {SegmentType: SegmentType.SubType} subTypeParent && customTypes.ContainsKey(subTypeParent.LastName.ToLower()))
+            { 
+                //customTypes[subTypeParent.LastName.ToLower()] = subTypeParent.DataType;
+            }
 
             var parent = context.UnresolvedTypes[i].Parent;
             if (context.UnresolvedTypes[i].ConcatOperator is ":" ||
@@ -127,29 +131,53 @@ public static class Analyzer
     {
         for (var i = 0; i < context.UnresolvedSegments.Count; i++)
         {
+            var nL = context.UnresolvedSegments[i].NameOrValue.ToLower();
+            
+            //Search in record or defined variable
             var variable = context.UnresolvedSegments[i].ConcatOperator is "." ? AnalyzerHelper.SearchVariableInRecord(context.UnresolvedSegments[i]) : 
                     AnalyzerHelper.SearchVariable(context.UnresolvedSegments[i], context.UnresolvedSegments[i].NameOrValue);
-            
-            if (variable == null &&
-                context.AvailableExposingVariables.ContainsKey(context.UnresolvedSegments[i].NameOrValue.ToLower()))
-                variable = context.AvailableExposingVariables[context.UnresolvedSegments[i].NameOrValue.ToLower()];
+
+            //Search in exposing variables
             if (variable == null)
-            {
-                var function = AnalyzerHelper.SearchFunction(context.UnresolvedSegments[i],
-                    context.UnresolvedSegments[i].NameOrValue);
-                if (function == null) continue; //Not found variable or function
-                context.UnresolvedSegments[i].SegmentType = SegmentType.VhdlFunction;
-                context.UnresolvedSegments[i].DataType = function.ReturnType;
-            }
-            else
+                context.AvailableExposingVariables.TryGetValue(nL, out variable);
+
+            if (variable != null)
             {
                 context.UnresolvedSegments[i].DataType = variable.DataType;
                 if (context.UnresolvedSegments[i].SegmentType is SegmentType.Unknown)
                     context.UnresolvedSegments[i].SegmentType = SegmentType.DataVariable;
+                
+                context.UnresolvedSegments.RemoveAt(i);
+                i--;
+                continue;
             }
 
-            context.UnresolvedSegments.RemoveAt(i);
-            i--;
+            //Search for function
+            var function = AnalyzerHelper.SearchFunction(context.UnresolvedSegments[i],
+                context.UnresolvedSegments[i].NameOrValue);
+
+            if (function != null)
+            {
+                context.UnresolvedSegments[i].SegmentType = SegmentType.VhdlFunction;
+                context.UnresolvedSegments[i].DataType = function.ReturnType;
+                
+                context.UnresolvedSegments.RemoveAt(i);
+                i--;
+                continue;
+            }
+            
+                        
+            //Search in enum
+            var en= AnalyzerHelper.SearchEnum(context, nL);
+            if (en != null)
+            {
+                context.UnresolvedSegments[i].SegmentType = SegmentType.DataVariable;
+                context.UnresolvedSegments[i].DataType = en;
+                
+                context.UnresolvedSegments.RemoveAt(i);
+                i--;
+                continue;
+            }
         }
     }
 

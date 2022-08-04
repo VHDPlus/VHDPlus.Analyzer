@@ -1,4 +1,5 @@
-﻿using VHDPlus.Analyzer.Diagnostics;
+﻿using System.Net.Mime;
+using VHDPlus.Analyzer.Diagnostics;
 using VHDPlus.Analyzer.Elements;
 
 namespace VHDPlus.Analyzer;
@@ -69,7 +70,7 @@ public static class ParserHelper
                 var enumName = context.CurrentSegment.NameOrValue.Split(' ',
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Last();
                 
-                context.AnalyzerContext.AddLocalType(enumName.ToLower(), new CustomDefinedEnum(enumName), context.CurrentSegment);
+                context.AnalyzerContext.AddLocalType(enumName.ToLower(), new CustomDefinedEnum(context.CurrentSegment, enumName), context.CurrentSegment);
                
                 return (SegmentType.EnumDeclaration, DataType.Unknown);
             }
@@ -102,13 +103,13 @@ public static class ParserHelper
             case SegmentType.Record:
             case SegmentType.Array:
                 if (context.CurrentConcatOperator is "is" && context.CurrentSegment is
-                        { SegmentType: SegmentType.Type or SegmentType.SubType })
+                        { SegmentType: SegmentType.Type })
                 {
                     var ownerWords = context.CurrentSegment.NameOrValue.Split(' ');
                     if (ownerWords.Length == 2)
                     {
                         context.AnalyzerContext.AddLocalType(ownerWords[1].ToLower(),
-                            type is SegmentType.Record ? new CustomDefinedRecord(ownerWords[1]) : new CustomDefinedArray(ownerWords[1]), context.CurrentSegment);
+                            type is SegmentType.Record ? new CustomDefinedRecord(context.CurrentSegment, ownerWords[1]) : new CustomDefinedArray(context.CurrentSegment, ownerWords[1]), context.CurrentSegment);
                     }
                 }
 
@@ -160,6 +161,15 @@ public static class ParserHelper
                                              name.EndsWith("port map", StringComparison.OrdinalIgnoreCase)))
                         return (SegmentType.Attribute, DataType.Unknown);
                     var dataType = ParseDeclaration(context, name);
+                    return (SegmentType.TypeUsage, dataType);
+                }
+                else if (context.CurrentSegment.SegmentType is SegmentType.SubType)
+                {
+                    var dataType = GetDeclaredDataType(context.AnalyzerContext, name);
+
+                    var decName = context.CurrentSegment.LastName.ToLower();
+                    if(decName.Length > 0)
+                        context.AnalyzerContext.AddLocalType(context.CurrentSegment.LastName.ToLower(), dataType, context.CurrentSegment);
                     return (SegmentType.TypeUsage, dataType);
                 }
                 else if (context.CurrentConcatOperator is "of")
@@ -333,7 +343,7 @@ public static class ParserHelper
     {
         var dataType = GetDeclaredDataType(context.AnalyzerContext, name);
         if (AnalyzerHelper.SearchTopSegment(context.CurrentSegment, SegmentType.Array) is
-            { Parent: { SegmentType: SegmentType.Type or SegmentType.SubType } } array)
+            { Parent: { SegmentType: SegmentType.Type } } array)
         {
             var typeName = array.Parent?.NameOrValue.Split(' ').Last().ToLower() ?? string.Empty;
             if (context.AnalyzerContext.AvailableTypes.ContainsKey(typeName) &&
@@ -464,7 +474,7 @@ public static class ParserHelper
         IVariableOwner variableOwner = segment;
 
         if (AnalyzerHelper.SearchTopSegment(segment, SegmentType.Record) is
-            { Parent: { SegmentType: SegmentType.Type or SegmentType.SubType } } record)
+            { Parent: { SegmentType: SegmentType.Type } } record)
         {
             var typeName = record.Parent?.NameOrValue.Split(' ').Last().ToLower() ?? string.Empty;
             if (types.TryGetValue(typeName, out var dt) && dt is CustomDefinedRecord cRecord)

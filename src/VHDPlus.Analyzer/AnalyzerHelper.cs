@@ -64,9 +64,23 @@ public static class AnalyzerHelper
 
     public static bool AreTypesCompatible(DataType from, DataType to, string op)
     {
-        return from.Name == to.Name || from is CustomDefinedEnum && to is CustomDefinedEnum ||
-               ValidPairs.Contains((from, to)) || op is "&" && ValidConcatPairs.Contains((from, to)) ||
-               op is "<=" or ">=" or "<" or ">" && ValidComparisonPairs.Contains((from, to));
+        if (from.Name == to.Name) return true;
+        if (from is CustomDefinedEnum && to is CustomDefinedEnum) return true;
+        
+        switch (op)
+        {
+            case "&":
+                //TODO Compare concat for custom records
+                if (from is CustomDefinedRecord or CustomDefinedArray || to is CustomDefinedRecord or CustomDefinedArray) return true;
+                return ValidConcatPairs.Contains((from, to));
+            case "<=":
+            case ">=": 
+            case "<" :
+            case ">" :
+                return ValidPairs.Contains((from, to)) || ValidComparisonPairs.Contains((from, to));
+            default:
+                return ValidPairs.Contains((from, to));
+        }
     }
 
     public static DefinedVariable? SearchVariable(Segment start, string? varName = null)

@@ -12,7 +12,7 @@ public static class Helper
         for (var i = 0; i < depth; i++) tab += "  ";
 
         var op = s.ConcatSegment ? $"[{s.ConcatOperator}]" : "";
-        var str = tab + op + s.NameOrValue + " " +s.Offset + " :" + s.SegmentType;
+        var str = tab + op + s.NameOrValue + " " +s.Offset + " :" + s.SegmentType + ","+ s.DataType;
         output.WriteLine(str);
            
         foreach (var par in s.Parameter)

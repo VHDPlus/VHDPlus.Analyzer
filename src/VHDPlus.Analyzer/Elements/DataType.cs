@@ -45,7 +45,15 @@ public class DataType
         Name = name;
         _description = description;
     }
+    
+    protected DataType(Segment owner, string name, string? description = null)
+    {
+        Owner = owner;
+        Name = name;
+        _description = description;
+    }
 
+    public Segment? Owner { get; }
     public string Name { get; }
     public virtual string Description => _description ?? "";
 

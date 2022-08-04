@@ -2,7 +2,7 @@
 
 public class CustomDefinedEnum : DataType
 {
-    public CustomDefinedEnum(string name) : base(name)
+    public CustomDefinedEnum(Segment owner, string name) : base(owner,name)
     {
     }
 

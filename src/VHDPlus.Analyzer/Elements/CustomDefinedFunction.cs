@@ -10,7 +10,6 @@ public class CustomDefinedFunction : IParameterOwner
     }
 
     public DataType ReturnType { get; set; }
-
     public List<FunctionParameter> Parameters { get; } = new();
     public string Name { get; }
     public string? Description { get; }

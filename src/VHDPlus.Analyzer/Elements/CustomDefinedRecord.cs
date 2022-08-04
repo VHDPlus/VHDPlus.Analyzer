@@ -2,8 +2,9 @@
 
 public class CustomDefinedRecord : DataType, IVariableOwner
 {
-    public CustomDefinedRecord(string name) : base(name)
+    public CustomDefinedRecord(Segment owner, string name) : base(owner, name)
     {
+        
     }
 
     public override string Description => $"Record {Name}:\n{string.Join('\n', Variables)}";

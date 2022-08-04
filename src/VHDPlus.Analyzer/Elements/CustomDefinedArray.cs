@@ -2,7 +2,7 @@
 
 public class CustomDefinedArray : DataType
 {
-    public CustomDefinedArray(string name) : base(name)
+    public CustomDefinedArray(Segment owner, string name) : base(owner, name)
     {
     }
 

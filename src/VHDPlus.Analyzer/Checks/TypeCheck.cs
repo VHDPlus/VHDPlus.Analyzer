@@ -44,14 +44,14 @@ public static class TypeCheck
     {
         var currentOperator = child.ConcatOperator;
         //Check types
-        if (currentOperator is null or "when" or "is" or "else" or "," or "and" or "." or ":" or "or" or "of" or "not") return;
+        if (currentOperator is null or "when" or "is" or "else" or "," or "and" or "." or ":" or "or" or "of" or "not" or "range") return;
         
         var (fD, segment) = ChildOperatorCheck(child);
         child = segment;
         var tD = ConvertTypeParameter(parent);
 
-        if (fD != DataType.Others && fD != DataType.Unknown && parent.DataType != DataType.Unknown &&
-            parent.DataType != DataType.Others)
+        if (fD != DataType.Others && fD != DataType.Unknown && tD != DataType.Unknown &&
+            tD != DataType.Others)
         {
             if (!AnalyzerHelper.InParameter(child) &&
                 parent is { Parent: { }, ConcatOperator: "=" or "<" or ">" or ">=" or "<=" or "/=" } &&
