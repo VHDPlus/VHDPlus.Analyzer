@@ -87,7 +87,7 @@ public static class SegmentParser
 
         if (context.CurrentSegment.Parent != null)
         {
-            context.AnalyzerContext.Diagnostics.Add(new GenericAnalyzerDiagnostic(context.AnalyzerContext,
+            context.AnalyzerContext.Diagnostics.Add(new SegmentParserDiagnostic(context.AnalyzerContext,
                 "Unexpected end of file",
                 DiagnosticLevel.Error, content.Length > 1 ? content.Length - 2 : 0, content.Length - 1));
             while (context.PopBlock())

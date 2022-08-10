@@ -1,13 +1,6 @@
 Component test_comp
 (
-    Generic
-    (
-        test_1 : NATURAL := 1;
-        test_2 : NATURAL := 2;
-    );
-    test_3 : IN STD_LOGIC; 
-    test_4 : OUT STD_LOGIC;
+    
 )
 {
     
-}
