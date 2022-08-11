@@ -73,7 +73,8 @@ public static class SegmentInfo
         },
         { SegmentType.Null, "Performs no action: ... when(others) { null; }" },
         { SegmentType.ParWhile, "Runs operation while condition met. Has to run in a finite amount of cycles" },
-        { SegmentType.While, "Runs operation while condition met" }
+        { SegmentType.While, "Runs operation while condition met" },
+        { SegmentType.Connections, "Can be used to help with connecting signals to FPGA I/Os" }
     };
 
     private static readonly Dictionary<SegmentType, string> Snippets = new()
@@ -83,6 +84,7 @@ public static class SegmentInfo
         { SegmentType.Component, "Component ´name´$0\n(\n\n)\n{\n \n}" },
         { SegmentType.Generate, "Generate($0)\n{\n \n}" },
         { SegmentType.Thread, "Thread\n{\n$0\n}" },
+        { SegmentType.Connections, "Connections\n{\n$0\n}" },
         { SegmentType.Process, "Process()\n{\n$0\n}" },
         { SegmentType.If, "If($0)" },
         { SegmentType.Elsif, "Elsif($0)" },
