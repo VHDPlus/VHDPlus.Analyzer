@@ -137,6 +137,7 @@ public static class SegmentCheck
                 yield return SegmentType.Thread;
                 yield return SegmentType.Exit;
                 yield return SegmentType.VhdlFunction;
+                yield return SegmentType.Return;
                 break;
             case SegmentType.Case:
                 yield return SegmentType.When;
