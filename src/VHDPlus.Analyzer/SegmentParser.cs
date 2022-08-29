@@ -385,6 +385,7 @@ public static class SegmentParser
                     if (lastWord is "end") context.PopSegment();
                     context.CurrentInnerIndex = context.CurrentIndex - lastWord.Length;
                     context.CurrentConcatOperator = lastWord;
+                    context.CurrentConcatOperatorIndex--;
                 }
 
                 {

@@ -55,7 +55,7 @@ public class SegmentParserContext
     }
 
     public bool Concat => CurrentConcatOperator != null;
-    public int CurrentConcatOperatorIndex { get; private set; }
+    public int CurrentConcatOperatorIndex { get; set; }
     public int ParameterDepth { get; set; }
 
     public char OffsetChar(int i)
