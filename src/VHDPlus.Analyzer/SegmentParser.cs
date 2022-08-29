@@ -140,6 +140,7 @@ public static class SegmentParser
                         if (!context.CurrentEmpty())
                         {
                             context.PushSegment();
+                            context.AnalyzerContext.Diagnostics.Add(new SegmentParserDiagnostic(context.AnalyzerContext, "Missing ;", DiagnosticLevel.Warning, context.CurrentSegment));
                             context.PopSegment();
                         }
 
