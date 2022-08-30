@@ -34,6 +34,6 @@
         VARIABLE a : UNSIGNED := "10";
         VARIABLE b : UNSIGNED := a(0) & '1';
         
-        VARIABLE c : BOOLEAN <= 0 < 1-1 OR true;
+        VARIABLE c : BOOLEAN := 0 < 1-1 OR true;
     }
 }

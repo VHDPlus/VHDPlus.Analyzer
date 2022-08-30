@@ -107,16 +107,16 @@ namespace VHDPlus.Analyzer.Tests
             var segment = AnalyzerHelper.GetSegmentFromOffset(result,  5217);
             
             Assert.NotNull(segment);
-            Assert.Equal(SegmentType.If, segment?.SegmentType);
+            Assert.Equal(SegmentType.DataVariable, segment?.SegmentType);
         }
         
         [Fact]
         public void AnalyzerParameterTests()
         {
-            Assert.Empty(Analyzer.Analyze("","Component a (){VARIABLE LED : INTEGER := (12) + (0 + (((1/10))/10)/10);}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
-            Assert.Empty(Analyzer.Analyze("","Component a (){VARIABLE LED : INTEGER := ((12) + (0 + (((1/10))/10)/10));}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
-            Assert.Empty(Analyzer.Analyze("","Component a (){VARIABLE LED : INTEGER := ((5) => (((5)/30)));}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
-            Assert.Empty(Analyzer.Analyze("","Component a (){VARIABLE LED : BOOLEAN := ((true) AND false);}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
+            Assert.Empty(Analyzer.Analyze("","Component a (){SIGNAL LED : INTEGER := (12) + (0 + (((1/10))/10)/10);}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
+            Assert.Empty(Analyzer.Analyze("","Component a (){SIGNAL LED : INTEGER := ((12) + (0 + (((1/10))/10)/10));}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
+            Assert.Empty(Analyzer.Analyze("","Component a (){SIGNAL LED : INTEGER := ((5) => (((5)/30)));}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
+            Assert.Empty(Analyzer.Analyze("","Component a (){SIGNAL LED : BOOLEAN := ((true) AND false);}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
         }
         
         [Fact]
@@ -125,8 +125,8 @@ namespace VHDPlus.Analyzer.Tests
             Assert.Empty(Analyzer.Analyze("","Component a (){Signal a : STD_LOGIC; a <= '1';}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
             Assert.Collection(Analyzer.Analyze("","Component a (){Signal a : STD_LOGIC; a := '1';}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check)
                 .Diagnostics, x => Assert.StartsWith("Invalid Operator", x.Message));
-            Assert.Empty(Analyzer.Analyze("","Component a (){Variable a : STD_LOGIC; a := '1';}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
-            Assert.Collection(Analyzer.Analyze("","Component a (){Variable a : STD_LOGIC; a <= '1';}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check)
+            Assert.Empty(Analyzer.Analyze("","Component a (){Process(){Variable a : STD_LOGIC; a := '1';}}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check).Diagnostics);
+            Assert.Collection(Analyzer.Analyze("","Component a (){Process(){Variable a : STD_LOGIC; a <= '1';}}", AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check)
                 .Diagnostics, x => Assert.StartsWith("Invalid Operator", x.Message));
         }
 
