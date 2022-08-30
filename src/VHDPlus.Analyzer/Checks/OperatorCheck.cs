@@ -9,17 +9,6 @@ public class OperatorCheck
     {
         switch (child.ConcatOperator)
         {
-            case "out":
-            case "in":
-            case "buffer":
-                if (parent.Parent is {Parent: not {SegmentType: SegmentType.Main or SegmentType.Component}} || !AnalyzerHelper.InParameter(parent.Parent ?? parent))
-                {
-                    context.Diagnostics.Add(new OperatorCheckDiagnostic(context,
-                        $"Cannot declare I/O outside of Main or Component parameters",
-                        DiagnosticLevel.Error, child.ConcatOperatorIndex,
-                        child.ConcatOperatorIndex + child.ConcatOperator.Length));
-                }
-                break;
             case "=":
                 if (AnalyzerHelper.SearchConcatParent(parent) is
                     {

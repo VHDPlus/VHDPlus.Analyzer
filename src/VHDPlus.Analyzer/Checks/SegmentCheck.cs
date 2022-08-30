@@ -22,6 +22,28 @@ public static class SegmentCheck
     public static void CheckSegmentPair(Segment parent, Segment child, AnalyzerContext context, bool parameter, bool thread)
     {
         if (child.SegmentType is SegmentType.Unknown || parent.SegmentType is SegmentType.Unknown || child.ConcatOperator is "," or "=>") return;
+
+        if (child.SegmentType is SegmentType.VariableDeclaration)
+        {
+            var variable = AnalyzerHelper.SearchVariable(child);
+
+            if (variable is {VariableType: VariableType.Io})
+            {
+                if (parent.SegmentType is not (SegmentType.Main or SegmentType.Component) || !parameter)
+                {
+                    context.Diagnostics.Add(new SegmentCheckDiagnostic(context,
+                        $"Cannot declare I/O outside of Main or Component parameters",
+                        DiagnosticLevel.Error, child));
+                }
+            }
+            if (variable is {VariableType: VariableType.Variable} && AnalyzerHelper.SearchTopSegment(child, SegmentType.Process, SegmentType.SeqFunction, SegmentType.Function) == null)
+            {
+                context.Diagnostics.Add(new SegmentCheckDiagnostic(context,
+                    $"VARIABLE cannot be declared outside of process or function",
+                    DiagnosticLevel.Error, child));
+            }
+ 
+        }
         if (parameter)
         {
             if (ValidSegmentsParameter[parent.SegmentType].Contains(child.SegmentType)) return;
@@ -45,7 +67,7 @@ public static class SegmentCheck
                 child));
         }
     }
-    
+
     private static IEnumerable<SegmentType> GetValidSegments(SegmentType type)
     {
         yield return SegmentType.Vhdl;
