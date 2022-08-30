@@ -85,7 +85,7 @@ public static class AnalyzerHelper
 
     public static DefinedVariable? SearchVariable(Segment start, string? varName = null)
     {
-        varName ??= start.NameOrValue;
+        varName ??= start.LastName;
 
         if (start.Context.AvailableExposingVariables.ContainsKey(varName.ToLower()))
             return start.Context.AvailableExposingVariables[varName.ToLower()];
@@ -176,9 +176,9 @@ public static class AnalyzerHelper
             : null;
     }
 
-    public static Segment? SearchTopSegment(Segment start, params SegmentType[] type)
+    public static Segment? SearchTopSegment(Segment? start, params SegmentType[] type)
     {
-        while (start.Parent != null)
+        while (start != null)
         {
             if (type.Contains(start.SegmentType)) return start;
             start = start.Parent;
