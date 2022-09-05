@@ -178,7 +178,7 @@ public static class PredefinedFunctions
         }
     };
 
-    private static readonly CustomDefinedFunction ShiftRight =
+    private static readonly CustomDefinedFunction ShiftRightFromUnsigned =
         new("shift_right", "Performs a shift-right on an UNSIGNED vector COUNT times")
         {
             ReturnType = DataType.Unsigned,
@@ -189,13 +189,35 @@ public static class PredefinedFunctions
             }
         };
 
-    private static readonly CustomDefinedFunction ShiftLeft =
+    private static readonly CustomDefinedFunction ShiftLeftFromUnsigned =
         new("shift_left", "Performs a shift-left on an UNSIGNED vector COUNT times")
         {
             ReturnType = DataType.Unsigned,
             Parameters =
             {
                 new FunctionParameter("Source", DataType.Unsigned),
+                new FunctionParameter("Count", DataType.Integer)
+            }
+        };
+    
+    private static readonly CustomDefinedFunction ShiftRightFromSigned =
+        new("shift_right", "Performs a shift-right on an SIGNED vector COUNT times")
+        {
+            ReturnType = DataType.Signed,
+            Parameters =
+            {
+                new FunctionParameter("Source", DataType.Signed),
+                new FunctionParameter("Count", DataType.Integer)
+            }
+        };
+
+    private static readonly CustomDefinedFunction ShiftLeftFromSigned =
+        new("shift_left", "Performs a shift-left on an SIGNED vector COUNT times")
+        {
+            ReturnType = DataType.Signed,
+            Parameters =
+            {
+                new FunctionParameter("Source", DataType.Signed),
                 new FunctionParameter("Count", DataType.Integer)
             }
         };
@@ -275,8 +297,8 @@ public static class PredefinedFunctions
         { "ext", new[] { Ext } },
         { "rising_edge", new[] { RisingEdge } },
         { "falling_edge", new[] { FallingEdge } },
-        { "shift_right", new[] { ShiftRight } },
-        { "shift_left", new[] { ShiftLeft } },
+        { "shift_right", new[] { ShiftRightFromSigned, ShiftRightFromUnsigned } },
+        { "shift_left", new[] { ShiftLeftFromSigned, ShiftLeftFromUnsigned } },
         { "conv_integer", new[] { ConvInteger } },
         {
             "conv_std_logic_vector",
