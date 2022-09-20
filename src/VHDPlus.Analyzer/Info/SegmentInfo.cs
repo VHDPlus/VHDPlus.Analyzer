@@ -143,7 +143,7 @@ public static class SegmentInfo
                     {
                         var variable = comp.Variables[segment.NameOrValue.ToLower()];
                         var comment = GetLineCommentForSegment(variable.Owner);
-                        return $"```vhdp{PrintSegment.Convert(variable.Owner)} {comment}\n```";
+                        return $"```vhdp\n{PrintSegment.Convert(variable.Owner).Trim()} {comment}\n```";
                     }
                 }
 
