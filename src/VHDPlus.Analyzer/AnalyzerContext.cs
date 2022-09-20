@@ -130,25 +130,30 @@ public class AnalyzerContext
             if (!_availableSeqFunctions.ContainsKey(k.Key))
                 _availableSeqFunctions.Add(k.Key, k.Value);
 
-        foreach (var k in pC.Files.SelectMany(f => f.TopLevels).Where(x => x.SegmentType is SegmentType.Component))
-            if (k.NameOrValue.Split(' ') is { Length: 2 } comp)
-                if (!_availableComponents.ContainsKey(comp[1].ToLower()))
-                    _availableComponents.Add(comp[1].ToLower(), k);
-        
-        foreach (var k in pC.Files.SelectMany(f => f.TopLevels).Where(x => x.SegmentType is SegmentType.Package))
-            if (k.NameOrValue.Split(' ') is { Length: 2 } package)
-                if (!_availablePackages.ContainsKey(package[1].ToLower()))
-                    _availablePackages.Add(package[1].ToLower(), k);
-
-        foreach (var k in pC.Files.SelectMany(f => f.TopLevels).Where(x => x.SegmentType is SegmentType.Main))
+        foreach (var k in pC.Files.SelectMany(f => f.TopLevels))
         {
-            var compName = Path.GetFileNameWithoutExtension(k.Context.FilePath).ToLower();
-            if (!_availableComponents.ContainsKey(compName))
+            switch (k.SegmentType)
             {
-                _availableComponents.Add(compName, k);
+                case SegmentType.Component:
+                    if (k.NameOrValue.Split(' ') is { Length: 2 } comp)
+                        if (!_availableComponents.ContainsKey(comp[1].ToLower()))
+                            _availableComponents.Add(comp[1].ToLower(), k);
+                    break;
+                case SegmentType.Main:
+                    var compName = Path.GetFileNameWithoutExtension(k.Context.FilePath).ToLower();
+                    if (!_availableComponents.ContainsKey(compName))
+                    {
+                        _availableComponents.Add(compName, k);
+                    }
+                    break;
+                case SegmentType.Package:
+                    if (k.NameOrValue.Split(' ') is { Length: 2 } package)
+                        if (!_availablePackages.ContainsKey(package[1].ToLower()))
+                            _availablePackages.Add(package[1].ToLower(), k);
+                    break;
             }
         }
-
+        
         _lastProjectContext = pC;
     }
 
