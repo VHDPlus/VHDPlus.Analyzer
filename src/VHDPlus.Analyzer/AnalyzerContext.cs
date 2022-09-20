@@ -9,6 +9,7 @@ public class AnalyzerContext
 {
     public static readonly AnalyzerContext Empty = new(string.Empty, string.Empty);
     private readonly Dictionary<string, Segment> _availableComponents = new();
+    private readonly Dictionary<string, Segment> _availablePackages = new();
     private readonly Dictionary<string, DefinedVariable> _availableExposingVariables = new();
     private readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> _availableFunctions = new();
     private readonly Dictionary<string, CustomDefinedSeqFunction> _availableSeqFunctions = new();
@@ -19,6 +20,7 @@ public class AnalyzerContext
     private readonly Dictionary<string, CustomDefinedSeqFunction> _seqFunctions = new();
     private readonly Dictionary<string, DataType> _types = new();
     public readonly ReadOnlyDictionary<string, Segment> AvailableComponents;
+    public readonly ReadOnlyDictionary<string, Segment> AvailablePackages;
     public readonly ReadOnlyDictionary<string, DefinedVariable> AvailableExposingVariables;
     public readonly ReadOnlyDictionary<string, IEnumerable<CustomDefinedFunction>> AvailableFunctions;
     public readonly ReadOnlyDictionary<string, CustomDefinedSeqFunction> AvailableSeqFunctions;
@@ -34,6 +36,7 @@ public class AnalyzerContext
     public readonly List<Segment> UnresolvedSegments = new();
     public readonly List<Segment> UnresolvedSeqFunctions = new();
     public readonly List<Segment> UnresolvedTypes = new();
+    private ProjectContext? _lastProjectContext;
 
     public AnalyzerContext(string filepath, string text)
     {
@@ -44,6 +47,7 @@ public class AnalyzerContext
         };
 
         AvailableComponents = new ReadOnlyDictionary<string, Segment>(_availableComponents);
+        AvailablePackages = new ReadOnlyDictionary<string, Segment>(_availablePackages);
         AvailableTypes = new ReadOnlyDictionary<string, DataType>(_availableTypes);
         AvailableFunctions = new ReadOnlyDictionary<string, IEnumerable<CustomDefinedFunction>>(_availableFunctions);
         AvailableExposingVariables = new ReadOnlyDictionary<string, DefinedVariable>(_availableExposingVariables);
@@ -122,14 +126,6 @@ public class AnalyzerContext
 
     public void AddProjectContext(ProjectContext pC)
     {
-        foreach (var k in pC.Files.SelectMany(f => f._types))
-            if (!_availableTypes.ContainsKey(k.Key))
-                _availableTypes.Add(k.Key, k.Value);
-
-        foreach (var k in pC.Files.SelectMany(f => f._exposingVariables))
-            if (!_availableExposingVariables.ContainsKey(k.Key))
-                _availableExposingVariables.Add(k.Key, k.Value);
-
         foreach (var k in pC.Files.SelectMany(f => f._seqFunctions))
             if (!_availableSeqFunctions.ContainsKey(k.Key))
                 _availableSeqFunctions.Add(k.Key, k.Value);
@@ -138,7 +134,11 @@ public class AnalyzerContext
             if (k.NameOrValue.Split(' ') is { Length: 2 } comp)
                 if (!_availableComponents.ContainsKey(comp[1].ToLower()))
                     _availableComponents.Add(comp[1].ToLower(), k);
-
+        
+        foreach (var k in pC.Files.SelectMany(f => f.TopLevels).Where(x => x.SegmentType is SegmentType.Package))
+            if (k.NameOrValue.Split(' ') is { Length: 2 } package)
+                if (!_availablePackages.ContainsKey(package[1].ToLower()))
+                    _availablePackages.Add(package[1].ToLower(), k);
 
         foreach (var k in pC.Files.SelectMany(f => f.TopLevels).Where(x => x.SegmentType is SegmentType.Main))
         {
@@ -148,6 +148,8 @@ public class AnalyzerContext
                 _availableComponents.Add(compName, k);
             }
         }
+
+        _lastProjectContext = pC;
     }
 
     public void ResolveIncludes()
@@ -157,6 +159,7 @@ public class AnalyzerContext
 
     private void ResolveInclude(string include)
     {
+        include = include.ToLower();
         switch (include.ToLower())
         {
             case "ieee.math_real.all":
@@ -171,17 +174,27 @@ public class AnalyzerContext
             case "ieee.std_logic_arith.all":
                 AddPackage(PredefinedFunctions.StdLogicArith, PredefinedTypes.StdLogicArith);
                 break;
+            default:
+                var parts = include.Split('.');
+                if (parts.Length > 1)
+                {
+                    if (AvailablePackages.TryGetValue(parts[0], out var package))
+                    {
+                        AddPackage(package.Context._functions, package.Context._types);
+                    }
+                }
+                break;
         }
     }
 
-    private void AddPackage(Dictionary<string, IEnumerable<CustomDefinedFunction>> functions, DataType[] types)
+    private void AddPackage(Dictionary<string, IEnumerable<CustomDefinedFunction>> functions, Dictionary<string, DataType> types)
     {
         //VHDP Default functions
         foreach (var func in functions)
             if (!_availableFunctions.ContainsKey(func.Key))
                 _availableFunctions.Add(func.Key, func.Value);
         foreach (var type in types)
-            if (!_availableTypes.ContainsKey(type.Name.ToLower()))
-                _availableTypes.Add(type.Name.ToLower(), type);
+            if (!_availableTypes.ContainsKey(type.Key))
+                _availableTypes.Add(type.Key, type.Value);
     }
 }

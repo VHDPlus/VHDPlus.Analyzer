@@ -81,6 +81,7 @@ public static class SegmentCheck
                 break;
             case SegmentType.Package:
                 yield return SegmentType.Include;
+                yield return SegmentType.Function;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.Type;
                 yield return SegmentType.SubType;
@@ -399,6 +400,9 @@ public static class SegmentCheck
                 yield return SegmentType.Type;
                 yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
+                break;
+            case SegmentType.IncludePackage:
+                yield return SegmentType.IncludePackage;
                 break;
             case SegmentType.Function:
                 yield return SegmentType.Return;
