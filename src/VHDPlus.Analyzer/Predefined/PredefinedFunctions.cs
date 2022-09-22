@@ -293,6 +293,11 @@ public static class PredefinedFunctions
         }
     };
 
+    public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> Standard = new()
+    {
+        
+    };
+    
     public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> StdLogic1164 = new()
     {
         {"rising_edge", new[] {RisingEdge}},

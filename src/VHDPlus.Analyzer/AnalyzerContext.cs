@@ -58,6 +58,8 @@ public class AnalyzerContext
         if (Path.GetExtension(filepath) != ".ghdp")
             _availableExposingVariables.Add("clk",
                 new DefinedIo(TopSegment, "CLK", DataType.StdLogic, VariableType.Io, IoType.In, 0));
+        
+        AddPackage(PredefinedFunctions.Standard, PredefinedTypes.Standard, new Dictionary<string, DefinedVariable>());
     }
 
     public IEnumerable<Segment> TopLevels => TopSegment.Children;

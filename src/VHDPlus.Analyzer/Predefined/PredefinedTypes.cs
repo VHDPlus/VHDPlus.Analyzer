@@ -2,34 +2,42 @@
 
 namespace VHDPlus.Analyzer.Predefined;
 
-public class PredefinedTypes
+public static class PredefinedTypes
 {
+    public static readonly Dictionary<string, DataType> Standard = new()
+    {
+        {"bit", DataType.Bit},
+        {"bit_vector", DataType.BitVector},
+        {"boolean", DataType.Boolean},
+        {"string", DataType.String},
+        {"time", DataType.Time},
+        {"real", DataType.Real},
+        {"integer", DataType.Integer},
+        {"natural", DataType.Natural},
+        {"positive", DataType.Positive},
+    };
+
     public static readonly Dictionary<string, DataType>  StdLogic1164 = new()
     {
+        {"std_logic", DataType.StdLogic},
+        {"std_ulogic", DataType.StdLogic},
+        {"std_logic_vector", DataType.StdLogicVector},
+        {"std_ulogic_vector", DataType.StdLogicVector},
     };
     
     public static readonly Dictionary<string, DataType> StdLogicArith = new()
     {
+        {"signed", DataType.Signed},
+        {"unsigned", DataType.Unsigned},
     };
 
     public static readonly Dictionary<string, DataType> NumericStd = new()
     {
-        {"std_logic", DataType.StdLogic},
-        {"std_logic_vector", DataType.StdLogicVector},
-        {"integer", DataType.Integer},
         {"signed", DataType.Signed},
-        {"natural", DataType.Natural},
         {"unsigned", DataType.Unsigned},
-        {"positive", DataType.Positive},
-        {"boolean", DataType.Boolean},
-        {"time", DataType.Time},
-        {"string", DataType.String},
-        {"bit", DataType.Bit},
-        {"bitvector", DataType.BitVector},
     };
 
     public static readonly Dictionary<string, DataType> MathReal = new()
     {
-        {"real", DataType.Real},
     };
 }
