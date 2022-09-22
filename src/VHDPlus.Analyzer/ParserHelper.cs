@@ -454,6 +454,15 @@ public static class ParserHelper
                         if (variableType == VariableType.Constant &&
                             AnalyzerHelper.SearchTopSegment(segment, SegmentType.Package) != null)
                             context.AnalyzerContext.AddLocalExposingVariable(varName.ToLower(), variable);
+                        if (variableType is VariableType.Unknown &&
+                            context.CurrentSegment.Parent is
+                                {SegmentType: SegmentType.Component or SegmentType.Main} &&
+                            context.CurrentParsePosition is ParsePosition.Parameter)
+                        {
+                            context.AnalyzerContext.Diagnostics.Add(new SegmentParserDiagnostic(context.AnalyzerContext,
+                                $"I/O Type missing (IN, OUT, BUFFER)", DiagnosticLevel.Error, off,
+                                off + varName.Length)); //TODO move outside of segment parser
+                        }
                     }
                 }
                 else

@@ -168,16 +168,16 @@ public class AnalyzerContext
         switch (include.ToLower())
         {
             case "ieee.math_real.all":
-                AddPackage(PredefinedFunctions.MathReal, PredefinedTypes.MathReal);
+                AddPackage(PredefinedFunctions.MathReal, PredefinedTypes.MathReal, new Dictionary<string, DefinedVariable>());
                 break;
             case "ieee.numeric_std.all":
-                AddPackage(PredefinedFunctions.NumericStd, PredefinedTypes.NumericStd);
+                AddPackage(PredefinedFunctions.NumericStd, PredefinedTypes.NumericStd,new Dictionary<string, DefinedVariable>());
                 break;
             case "ieee.std_logic_1164.all":
-                AddPackage(PredefinedFunctions.StdLogic1164, PredefinedTypes.StdLogic1164);
+                AddPackage(PredefinedFunctions.StdLogic1164, PredefinedTypes.StdLogic1164,new Dictionary<string, DefinedVariable>());
                 break;
             case "ieee.std_logic_arith.all":
-                AddPackage(PredefinedFunctions.StdLogicArith, PredefinedTypes.StdLogicArith);
+                AddPackage(PredefinedFunctions.StdLogicArith, PredefinedTypes.StdLogicArith,new Dictionary<string, DefinedVariable>());
                 break;
             default:
                 var parts = include.Split('.');
@@ -185,14 +185,14 @@ public class AnalyzerContext
                 {
                     if (AvailablePackages.TryGetValue(parts[0], out var package))
                     {
-                        AddPackage(package.Context._functions, package.Context._types);
+                        AddPackage(package.Context._functions, package.Context._types, package.Context._exposingVariables);
                     }
                 }
                 break;
         }
     }
 
-    private void AddPackage(Dictionary<string, IEnumerable<CustomDefinedFunction>> functions, Dictionary<string, DataType> types)
+    private void AddPackage(Dictionary<string, IEnumerable<CustomDefinedFunction>> functions, Dictionary<string, DataType> types, Dictionary<string, DefinedVariable> constants)
     {
         //VHDP Default functions
         foreach (var func in functions)
@@ -201,5 +201,8 @@ public class AnalyzerContext
         foreach (var type in types)
             if (!_availableTypes.ContainsKey(type.Key))
                 _availableTypes.Add(type.Key, type.Value);
+        foreach (var constant in constants)
+            if (!_availableExposingVariables.ContainsKey(constant.Key))
+                _availableExposingVariables.Add(constant.Key, constant.Value);
     }
 }
