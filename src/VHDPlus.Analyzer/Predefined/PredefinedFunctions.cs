@@ -168,7 +168,17 @@ public static class PredefinedFunctions
         }
     };
 
-    private static readonly CustomDefinedFunction Ext = new("ext", "Resizes STD_LOGIC_VECTOR")
+    private static readonly CustomDefinedFunction Ext = new("ext", "Zero extend STD_LOGIC_VECTOR")
+    {
+        ReturnType = DataType.StdLogicVector,
+        Parameters =
+        {
+            new FunctionParameter("Source", DataType.StdLogicVector),
+            new FunctionParameter("New Size", DataType.Integer)
+        }
+    };
+    
+    private static readonly CustomDefinedFunction Sxt = new("sxt", "Sign extend STD_LOGIC_VECTOR")
     {
         ReturnType = DataType.StdLogicVector,
         Parameters =
@@ -283,7 +293,11 @@ public static class PredefinedFunctions
         }
     };
 
-    public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> StdLogic1164 = new();
+    public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> StdLogic1164 = new()
+    {
+        {"rising_edge", new[] {RisingEdge}},
+        {"falling_edge", new[] {FallingEdge}},
+    };
 
     public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> NumericStd = new()
     {
@@ -294,23 +308,22 @@ public static class PredefinedFunctions
         { "to_integer", new[] { ToIntegerFromSigned, ToIntegerFromUnsigned } },
         { "std_logic_vector", new[] { StdLogicVectorFromSigned, StdLogicVectorFromUnsigned } },
         { "resize", new[] { ResizeFromSigned, ResizeFromUnsigned } },
-        { "ext", new[] { Ext } },
-        { "rising_edge", new[] { RisingEdge } },
-        { "falling_edge", new[] { FallingEdge } },
         { "shift_right", new[] { ShiftRightFromSigned, ShiftRightFromUnsigned } },
         { "shift_left", new[] { ShiftLeftFromSigned, ShiftLeftFromUnsigned } },
-        { "conv_integer", new[] { ConvInteger } },
-        {
-            "conv_std_logic_vector",
-            new[] { ConvStdLogicVectorFromInteger, ConvStdLogicVectorFromSigned, ConvStdLogicVectorFromUnsigned }
-        },
         { "to_bit", new[] { ToBit } },
         { "to_bitvector", new[] { ToBitVector } }
     };
     
     public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> StdLogicArith = new()
     {
+        { "sxt", new[] { Sxt } },
+        { "ext", new[] { Ext } },
         { "conv_integer", new[] { ConvInteger } },
+        {
+            "conv_std_logic_vector",
+            new[] { ConvStdLogicVectorFromInteger, ConvStdLogicVectorFromSigned, ConvStdLogicVectorFromUnsigned }
+        },
+        
     };
 
     public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> MathReal = new()
