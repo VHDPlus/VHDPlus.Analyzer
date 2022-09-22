@@ -136,6 +136,11 @@ public class SegmentParserContext
             case SegmentType.Vhdl:
                 VhdlMode = true;
                 break;
+            case SegmentType.Main:
+                var pf = Path.GetFileNameWithoutExtension(AnalyzerContext.FilePath).ToLower();
+                newSegment.NameOrValue = "Component " + pf; 
+                AnalyzerContext.AddLocalComponent(pf, newSegment);
+                break;
             case SegmentType.Component:
                 AnalyzerContext.AddLocalComponent(words.Last().ToLower(), newSegment);
                 break;

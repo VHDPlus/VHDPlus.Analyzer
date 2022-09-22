@@ -88,7 +88,7 @@ public class Segment : IVariableOwner
     public Segment? Parent { get; }
     public List<Segment> Children { get; } = new();
     public List<List<Segment>> Parameter { get; } = new();
-    public string NameOrValue { get; }
+    public string NameOrValue { get; set; }
     public bool ConcatSegment => ConcatOperator != null;
     public string? ConcatOperator { get; set; }
     public int ConcatOperatorIndex { get; }

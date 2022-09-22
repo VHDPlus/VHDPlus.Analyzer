@@ -38,7 +38,6 @@ public class AnalyzerContext
     public readonly List<Segment> UnresolvedSegments = new();
     public readonly List<Segment> UnresolvedSeqFunctions = new();
     public readonly List<Segment> UnresolvedTypes = new();
-    private ProjectContext? _lastProjectContext;
 
     public AnalyzerContext(string filepath, string text)
     {
@@ -101,7 +100,7 @@ public class AnalyzerContext
         if (!_availableComponents.ContainsKey(key))
         {
             _components.Add(key, owner);
-            _availableComponents.Add(key, owner);
+            //_availableComponents.Add(key, owner);
         }
     }
     
@@ -159,8 +158,6 @@ public class AnalyzerContext
             if (!_availablePackages.ContainsKey(k.Key))
                 _availablePackages.Add(k.Key, k.Value);
         }
-
-        _lastProjectContext = pC;
     }
 
     public void ResolveIncludes()
