@@ -546,22 +546,11 @@ public static class ParserHelper
         if (words.Length == 0) return DataType.Unknown;
         var typeStr = VhdlIos.Contains(words[0].ToLower()) && words.Length > 1 ? words[1] : words[0];
 
-        return typeStr.ToLower() switch
+        if (context.AvailableTypes.TryGetValue(typeStr.ToLower(), out var dataType))
         {
-            "std_logic" => DataType.StdLogic,
-            "std_logic_vector" => DataType.StdLogicVector,
-            "integer" => DataType.Integer,
-            "signed" => DataType.Signed,
-            "unsigned" => DataType.Unsigned,
-            "string" => DataType.String,
-            "time" => DataType.Time,
-            "boolean" => DataType.Boolean,
-            "natural" => DataType.Natural,
-            "positive" => DataType.Positive,
-            _ => context.AvailableTypes.ContainsKey(typeStr.ToLower())
-                ? context.AvailableTypes[typeStr.ToLower()]
-                : DataType.Unknown
-        };
+            return dataType;
+        }
+        return DataType.Unknown;
     }
 
     public static VariableType GetVariableType(string tr)
