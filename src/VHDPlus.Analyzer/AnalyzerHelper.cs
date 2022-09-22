@@ -8,13 +8,17 @@ public static class AnalyzerHelper
     private static readonly List<(DataType, DataType)> ValidPairs = new()
     {
         (DataType.StdLogicVector, DataType.StdLogic),
+        (DataType.StdLogicVector, DataType.StdULogic),
         (DataType.StdLogicVector, DataType.Unsigned),
         (DataType.StdLogicVector, DataType.String),
+        (DataType.StdLogicVector, DataType.StdULogicVector),
         (DataType.String, DataType.StdLogicVector),
         (DataType.Unsigned, DataType.StdLogic),
+        (DataType.Unsigned, DataType.StdULogic),
         (DataType.Integer, DataType.Unsigned),
         (DataType.Integer, DataType.Signed),
         (DataType.Integer, DataType.StdLogicVector),
+        (DataType.Integer, DataType.StdULogicVector),
         (DataType.Integer, DataType.Positive),
         (DataType.Integer, DataType.Natural),
         (DataType.Integer, DataType.Real),
@@ -29,14 +33,26 @@ public static class AnalyzerHelper
     private static readonly List<(DataType, DataType)> ValidConcatPairs = new()
     {
         (DataType.StdLogicVector, DataType.StdLogic),
+        (DataType.StdLogicVector, DataType.StdULogic),
         (DataType.StdLogicVector, DataType.Unsigned),
         (DataType.StdLogicVector, DataType.Signed),
+        (DataType.StdULogicVector, DataType.StdLogic),
+        (DataType.StdULogicVector, DataType.StdULogic),
+        (DataType.StdULogicVector, DataType.Unsigned),
+        (DataType.StdULogicVector, DataType.Signed),
         (DataType.StdLogic, DataType.StdLogicVector),
         (DataType.StdLogic, DataType.Signed),
         (DataType.StdLogic, DataType.Unsigned),
+        (DataType.StdULogic, DataType.StdLogicVector),
+        (DataType.StdULogic, DataType.StdULogicVector),
+        (DataType.StdULogic, DataType.Signed),
+        (DataType.StdULogic, DataType.Unsigned),
         (DataType.Unsigned, DataType.StdLogicVector),
+        (DataType.Unsigned, DataType.StdULogicVector),
         (DataType.Unsigned, DataType.StdLogic),
-        (DataType.Signed, DataType.StdLogicVector)
+        (DataType.Unsigned, DataType.StdULogic),
+        (DataType.Signed, DataType.StdLogicVector),
+        (DataType.Signed, DataType.StdLogicVector),
     };
 
     private static readonly List<(DataType, DataType)> ValidComparisonPairs = new()
@@ -44,7 +60,9 @@ public static class AnalyzerHelper
         (DataType.Unsigned, DataType.Natural),
         (DataType.Natural, DataType.Unsigned),
         (DataType.Unsigned, DataType.StdLogicVector),
-        (DataType.StdLogicVector, DataType.Unsigned)
+        (DataType.Unsigned, DataType.StdULogicVector),
+        (DataType.StdLogicVector, DataType.Unsigned),
+        (DataType.StdULogicVector, DataType.Unsigned),
     };
 
     public static bool IsWordLetter(this char c)

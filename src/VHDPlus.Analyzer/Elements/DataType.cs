@@ -6,9 +6,15 @@ public class DataType
 
     public static readonly DataType StdLogic = new("STD_LOGIC",
         "Type with states '0', '1', 'U', 'X', 'Z', 'W', 'L', 'H' and '-'");
+    
+    public static readonly DataType StdULogic = new("STD_ULOGIC",
+        "Type with states '0', '1', 'U', 'X', 'Z', 'W', 'L', 'H' and '-'");
 
     public static readonly DataType StdLogicVector =
         new("STD_LOGIC_VECTOR", "Array of STD_LOGIC\nSize e.g. (7 downto 0)");
+    
+    public static readonly DataType StdULogicVector =
+        new("STD_ULOGIC_VECTOR", "Array of STD_ULOGIC\nSize e.g. (7 downto 0)");
 
     public static readonly DataType Integer = new("INTEGER",
         "Number with a maximum range of -2147483648 to 2147483647\nSize e.g. range 0 to 255");

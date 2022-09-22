@@ -292,6 +292,33 @@ public static class PredefinedFunctions
             new FunctionParameter("Source", DataType.StdLogicVector)
         }
     };
+    
+    private static readonly CustomDefinedFunction IsXFromStdUlogic = new("is_x", "Returns true if the value is one of the undefined values ( 'U', 'X', 'Z', 'W', '-')")
+    {
+        ReturnType = DataType.Boolean,
+        Parameters =
+        {
+            new FunctionParameter("Source", DataType.StdULogic)
+        }
+    };
+    
+    private static readonly CustomDefinedFunction IsXFromStdUlogicVector = new("is_x", "Returns true if the value is one of the undefined values ( 'U', 'X', 'Z', 'W', '-')")
+    {
+        ReturnType = DataType.Boolean,
+        Parameters =
+        {
+            new FunctionParameter("Source", DataType.StdULogicVector)
+        }
+    };
+    
+    private static readonly CustomDefinedFunction IsXFromStdLogicVector = new("is_x", "Returns true if the value is one of the undefined values ( 'U', 'X', 'Z', 'W', '-')")
+    {
+        ReturnType = DataType.Boolean,
+        Parameters =
+        {
+            new FunctionParameter("Source", DataType.StdLogicVector)
+        }
+    };
 
     public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> Standard = new()
     {
@@ -302,6 +329,7 @@ public static class PredefinedFunctions
     {
         {"rising_edge", new[] {RisingEdge}},
         {"falling_edge", new[] {FallingEdge}},
+        {"is_x", new[] {IsXFromStdUlogic, IsXFromStdUlogicVector, IsXFromStdLogicVector}},
     };
 
     public static readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> NumericStd = new()

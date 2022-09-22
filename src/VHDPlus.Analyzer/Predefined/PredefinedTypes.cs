@@ -20,9 +20,9 @@ public static class PredefinedTypes
     public static readonly Dictionary<string, DataType>  StdLogic1164 = new()
     {
         {"std_logic", DataType.StdLogic},
-        {"std_ulogic", DataType.StdLogic},
+        {"std_ulogic", DataType.StdULogic},
         {"std_logic_vector", DataType.StdLogicVector},
-        {"std_ulogic_vector", DataType.StdLogicVector},
+        {"std_ulogic_vector", DataType.StdULogicVector},
     };
     
     public static readonly Dictionary<string, DataType> StdLogicArith = new()
