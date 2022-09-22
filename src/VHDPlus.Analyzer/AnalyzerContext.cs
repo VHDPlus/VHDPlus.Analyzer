@@ -15,6 +15,7 @@ public class AnalyzerContext
     private readonly Dictionary<string, CustomDefinedSeqFunction> _availableSeqFunctions = new();
     private readonly Dictionary<string, DataType> _availableTypes = new();
     private readonly Dictionary<string, Segment> _components = new();
+    private readonly Dictionary<string, Segment> _packages = new();
     private readonly Dictionary<string, DefinedVariable> _exposingVariables = new();
     private readonly Dictionary<string, IEnumerable<CustomDefinedFunction>> _functions = new();
     private readonly Dictionary<string, CustomDefinedSeqFunction> _seqFunctions = new();
@@ -86,6 +87,24 @@ public class AnalyzerContext
         return Comments.Any(c => offset >= c.Range.Start.Value && offset <= c.Range.End.Value);
     }
 
+    public void AddLocalPackage(string key, Segment owner)
+    {
+        if (!_availablePackages.ContainsKey(key))
+        {
+            _packages.Add(key, owner);
+            _availablePackages.Add(key, owner);
+        }
+    }
+    
+    public void AddLocalComponent(string key, Segment owner)
+    {
+        if (!_availableComponents.ContainsKey(key))
+        {
+            _components.Add(key, owner);
+            _availableComponents.Add(key, owner);
+        }
+    }
+    
     public void AddLocalType(string key, DataType type, Segment owner)
     {
         if(!AvailableTypes.ContainsKey(key))
@@ -129,30 +148,18 @@ public class AnalyzerContext
             if (!_availableSeqFunctions.ContainsKey(k.Key))
                 _availableSeqFunctions.Add(k.Key, k.Value);
 
-        foreach (var k in pC.Files.SelectMany(f => f.TopLevels))
+        foreach (var k in pC.Files.SelectMany(f => f._components))
         {
-            switch (k.SegmentType)
-            {
-                case SegmentType.Component:
-                    if (k.NameOrValue.Split(' ') is { Length: 2 } comp)
-                        if (!_availableComponents.ContainsKey(comp[1].ToLower()))
-                            _availableComponents.Add(comp[1].ToLower(), k);
-                    break;
-                case SegmentType.Main:
-                    var compName = Path.GetFileNameWithoutExtension(k.Context.FilePath).ToLower();
-                    if (!_availableComponents.ContainsKey(compName))
-                    {
-                        _availableComponents.Add(compName, k);
-                    }
-                    break;
-                case SegmentType.Package:
-                    if (k.NameOrValue.Split(' ') is { Length: 2 } package)
-                        if (!_availablePackages.ContainsKey(package[1].ToLower()))
-                            _availablePackages.Add(package[1].ToLower(), k);
-                    break;
-            }
+            if (!_availableComponents.ContainsKey(k.Key))
+                _availableComponents.Add(k.Key, k.Value);
         }
         
+        foreach (var k in pC.Files.SelectMany(f => f._packages))
+        {
+            if (!_availablePackages.ContainsKey(k.Key))
+                _availablePackages.Add(k.Key, k.Value);
+        }
+
         _lastProjectContext = pC;
     }
 

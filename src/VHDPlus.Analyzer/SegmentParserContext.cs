@@ -136,8 +136,11 @@ public class SegmentParserContext
             case SegmentType.Vhdl:
                 VhdlMode = true;
                 break;
-            case SegmentType.NewComponent:
-                AnalyzerContext.UnresolvedComponents.Add(newSegment);
+            case SegmentType.Component:
+                AnalyzerContext.AddLocalComponent(words.Last().ToLower(), newSegment);
+                break;
+            case SegmentType.Package:
+                AnalyzerContext.AddLocalPackage(words.Last().ToLower(), newSegment);
                 break;
             case SegmentType.NewFunction:
                 AnalyzerContext.UnresolvedSeqFunctions.Add(newSegment);
