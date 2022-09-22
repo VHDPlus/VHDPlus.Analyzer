@@ -105,17 +105,22 @@ public static class TypeCheck
 
         switch (child.ConcatOperator)
         {
-            case "<" or ">" or "=" or "/="
+            case "<" or ">" or "=" or "/=" or "<=" or ">="
                 when s.ConcatOperator is not ("/" or "+" or "-" or "*" or "**" or "mod" or "&"):
                 return (DataType.Boolean, s);
             case "&" when (cD == DataType.StdLogicVector || cD == DataType.StdLogic) &&
                           (sD == DataType.StdLogicVector || sD == DataType.StdLogic):
                 return (DataType.StdLogicVector, s);
+            case "&" when (cD == DataType.StdLogicVector || cD == DataType.Unsigned) &&
+                          (sD == DataType.StdLogicVector || sD == DataType.Unsigned):
+                return (DataType.Unsigned, s);
             case "&" when (cD == DataType.Unsigned || cD == DataType.StdLogic) &&
                           (sD == DataType.Unsigned || sD == DataType.StdLogic):
                 return (DataType.Unsigned, s);
             case "'" when sD == DataType.StdLogicVector || sD == DataType.Signed || sD == DataType.Unsigned:
                 return (DataType.Integer, s);
+            case "," when s.Parent is not {SegmentType: SegmentType.Function or SegmentType.VhdlFunction}:
+                return (DataType.Unknown, s);
             default:
                 return (sD, s);
         }
@@ -135,6 +140,10 @@ public static class TypeCheck
         {
             if (AnalyzerHelper.SearchFunction(s, s.NameOrValue) is { } func) return func.ReturnType;
             return type;
+        }
+        if (s.SegmentType is SegmentType.EmptyName && par.Count == 1)
+        {
+            return ChildOperatorCheck(par.First()).Item1;
         }
 
         if (par.Any() && AnalyzerHelper.SearchOperatorChild(par.First(), "downto") != null) return type;

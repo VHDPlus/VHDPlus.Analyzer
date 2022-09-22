@@ -1,6 +1,16 @@
-Component test_comp
+Main
 (
-    
+    led : OUT STD_LOGIC;
 )
 {
+    TYPE s IS ARRAY (0 to 2) OF STD_LOGIC_VECTOR(15 downto 0);
+    TYPE ds IS ARRAY (0 to 2) OF s;
+    
+    CONSTANT default_init : ds :=
+       (
+           (x"3EB4", x"676A", x"0001"),
+           (x"3EBC", x"0010", x"0001"),
+           (x"301A", x"001C", x"0001")
+       );
+}
     

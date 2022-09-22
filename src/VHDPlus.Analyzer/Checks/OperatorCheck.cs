@@ -34,7 +34,7 @@ public class OperatorCheck
                         DiagnosticLevel.Error, child.ConcatOperatorIndex,
                         child.ConcatOperatorIndex + child.ConcatOperator.Length));
                 break;
-            case "<=" when !AnalyzerHelper.InParameter(parent):
+            case "<=" when !AnalyzerHelper.InParameter(parent) && AnalyzerHelper.SearchTopOperator(parent, "<=", ":=") == null:
                 if (AnalyzerHelper.SearchConcatParent(parent) is
                     {
                         SegmentType: SegmentType.DataVariable or SegmentType.VariableDeclaration,

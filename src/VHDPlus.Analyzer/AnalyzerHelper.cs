@@ -223,6 +223,7 @@ public static class AnalyzerHelper
     {
         while (s.Parent != null)
         {
+            if (s.ConcatOperator == null) return null;
             if (operators.Contains(s.ConcatOperator)) return s;
             s = s.Parent;
         }
