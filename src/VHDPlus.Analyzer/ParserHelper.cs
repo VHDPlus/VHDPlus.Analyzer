@@ -88,6 +88,9 @@ public static class ParserHelper
 
         switch (type)
         {
+            case SegmentType.Include:
+                context.AnalyzerContext.IncludeExists = true;
+                return (SegmentType.Include, DataType.Unknown);
             case SegmentType.Component when words.Length == 3 && words[2].ToLower() is "port":
                 context.CurrentInner.Remove(context.CurrentInner.Length - words[2].Length - 1,
                     words[2].Length);

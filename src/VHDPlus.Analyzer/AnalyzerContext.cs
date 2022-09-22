@@ -29,6 +29,7 @@ public class AnalyzerContext
     public readonly Dictionary<string, ConnectionMember> Connections = new();
     public readonly List<IAnalyzerDiagnostic> Diagnostics = new();
     public readonly string FilePath;
+    public bool IncludeExists { get; set; }
     public readonly List<string> Includes = new();
     public readonly List<int> LineOffsets = new() { 0 };
     public readonly Segment TopSegment;
@@ -57,10 +58,6 @@ public class AnalyzerContext
         if (Path.GetExtension(filepath) != ".ghdp")
             _availableExposingVariables.Add("clk",
                 new DefinedIo(TopSegment, "CLK", DataType.StdLogic, VariableType.Io, IoType.In, 0));
-
-        ResolveInclude("ieee.numeric_std.all");
-        ResolveInclude("ieee.std_logic_1164.all");
-        ResolveInclude("ieee.math_real.all");
     }
 
     public IEnumerable<Segment> TopLevels => TopSegment.Children;
@@ -159,7 +156,21 @@ public class AnalyzerContext
 
     public void ResolveIncludes()
     {
-        foreach (var include in Includes) ResolveInclude(include);
+        if (!Includes.Any(x => x.StartsWith("ieee.", StringComparison.OrdinalIgnoreCase)))
+        {
+            ResolveInclude("ieee.numeric_std.all");
+            ResolveInclude("ieee.std_logic_1164.all");
+            ResolveInclude("ieee.math_real.all");
+        }
+
+        if (!IncludeExists)
+        {
+            foreach (var include in AvailablePackages) ResolveInclude(include.Key + ".all");
+        }
+        else
+        {
+            foreach (var include in Includes) ResolveInclude(include);
+        }
     }
 
     private void ResolveInclude(string include)
