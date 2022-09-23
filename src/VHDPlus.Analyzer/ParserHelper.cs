@@ -137,7 +137,8 @@ public static class ParserHelper
                 var func = AnalyzerHelper.SearchFunction(context.CurrentSegment, context.CurrentSegment.LastName);
                 if (func != null)
                 {
-                    var dataType = GetDeclaredDataType(context.AnalyzerContext, words[1]);
+                    var dataType = GetNativeDataType(words[1]);
+                    if (dataType == DataType.Unknown) dataType = GetDeclaredDataType(context.AnalyzerContext, words[1]);
                     func.ReturnType = dataType;
                     return (SegmentType.Return, dataType);
                 }

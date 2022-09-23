@@ -45,6 +45,7 @@ public static class FunctionInfo
 
     public static string GetInsert(CustomDefinedFunction function)
     {
-        return $"{function.Name}($0)";
+        if(function.Parameters.Any()) return $"{function.Name}($0)";
+        return function.Name;
     }
 }

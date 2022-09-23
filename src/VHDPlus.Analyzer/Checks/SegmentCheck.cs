@@ -87,14 +87,12 @@ public static class SegmentCheck
                 yield return SegmentType.SubType;
                 yield return SegmentType.SeqFunction;
                 yield return SegmentType.VhdlEnd;
-                yield return SegmentType.Vhdl;
                 break;
             case SegmentType.AttributeDeclaration:
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.Type;
                 yield return SegmentType.SubType;
                 yield return SegmentType.Function;
-                yield return SegmentType.Vhdl;
                 break;
             case SegmentType.GlobalSegment:
                 yield return SegmentType.Main;
