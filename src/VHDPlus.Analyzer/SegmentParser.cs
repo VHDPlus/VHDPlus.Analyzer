@@ -371,7 +371,7 @@ public static class SegmentParser
 
                 if (lastWord == "") return;
 
-                if (lastWord is "to" or "end" || lastWord is "when" &&
+                if (lastWord is "to" or "end" or "return" || lastWord is "when" &&
                     AnalyzerHelper.SearchConcatParent(context.CurrentSegment, SegmentType.Case) is not
                         { SegmentType: SegmentType.Case } ||
                     lastWord == "else" && (context.CurrentConcatOperator == "when" ||

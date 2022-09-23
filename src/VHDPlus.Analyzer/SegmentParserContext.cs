@@ -128,11 +128,6 @@ public class SegmentParserContext
             case SegmentType.TypeUsage when dataType == DataType.Unknown:
                 AnalyzerContext.UnresolvedTypes.Add(newSegment);
                 break;
-            case SegmentType.Return when dataType == DataType.Unknown &&
-                                         CurrentSegment.SegmentType is SegmentType.Function &&
-                                         !CurrentSegment.Children.Any():
-                AnalyzerContext.UnresolvedTypes.Add(newSegment);
-                break;
             case SegmentType.Vhdl:
                 VhdlMode = true;
                 break;

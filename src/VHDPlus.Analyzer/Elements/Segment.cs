@@ -17,7 +17,6 @@ public enum SegmentType
     SeqFunction,
     SeqFor,
     NewFunction,
-    Return,
     Null,
     TypeUsage,
     Type,

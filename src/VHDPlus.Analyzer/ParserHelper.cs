@@ -129,18 +129,6 @@ public static class ParserHelper
             {
                 return (SegmentType.Function, DataType.Unknown);
             }
-            case SegmentType.Return when words.Length == 2 && context.CurrentSegment is
-                { SegmentType: SegmentType.Function }:
-                var func = AnalyzerHelper.SearchFunction(context.CurrentSegment, context.CurrentSegment.LastName);
-                if (func != null)
-                {
-                    var dataType = GetNativeDataType(words[1]);
-                    if (dataType == DataType.Unknown) dataType = GetDeclaredDataType(context.AnalyzerContext, words[1]);
-                    if(context.CurrentParsePosition is ParsePosition.Parameter) func.ReturnType = dataType;
-                    return (SegmentType.Return, dataType);
-                }
-
-                return (SegmentType.Return, DataType.Unknown);
             case SegmentType.SeqFunction:
                 return (SegmentType.SeqFunction, DataType.Unknown);
             case SegmentType.For:
@@ -286,6 +274,33 @@ public static class ParserHelper
                          VhdlAttributes.Contains(name.ToLower()))
                 {
                     return (SegmentType.VhdlAttribute, DataType.Unknown);
+                }
+                else if (context.CurrentConcatOperator is "return")
+                {
+                    if (context.CurrentSegment.Parent is {SegmentType: SegmentType.Function} && context.CurrentParsePosition is ParsePosition.Parameter)
+                    {
+                        var func = AnalyzerHelper.SearchFunction(context.CurrentSegment, context.CurrentSegment.LastName);
+                        if (func != null && words.Length > 1)
+                        {
+                            func.ReturnType = GetDeclaredDataType(context.AnalyzerContext, words[1]);
+                            return (SegmentType.TypeUsage, func.ReturnType);
+                        }
+                        return (SegmentType.TypeUsage, DataType.Unknown);
+                    }
+                    else
+                    {
+                        if (words.Length > 1)
+                        {
+                            var nativeData = GetNativeDataType(words[1]);
+                            if (nativeData != DataType.Unknown) return (SegmentType.NativeDataValue, nativeData);
+                            if (AnalyzerHelper.SearchVariable(context.CurrentSegment, name) is
+                                { } returnVariable)
+                            {
+                                return (SegmentType.DataVariable, returnVariable.DataType);
+                            }
+                        }
+                        return (SegmentType.DataVariable, DataType.Unknown);
+                    }
                 }
                 else if (context.CurrentParsePosition is ParsePosition.Parameter &&
                          context.CurrentChar is '=' && context.NextChar is '>')

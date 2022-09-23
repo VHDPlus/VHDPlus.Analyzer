@@ -52,7 +52,7 @@ public static class Analyzer
     {
         for (var i = 0; i < context.UnresolvedTypes.Count; i++)
         {
-            if (context.UnresolvedTypes[i].SegmentType is SegmentType.Return)
+            if (context.UnresolvedTypes[i].ConcatOperator is "return")
             {
                 if (!customTypes.ContainsKey(context.UnresolvedTypes[i].LastName.ToLower())) continue;
                 var owner = ParserHelper.GetVariableOwner(customTypes, context.UnresolvedTypes[i],

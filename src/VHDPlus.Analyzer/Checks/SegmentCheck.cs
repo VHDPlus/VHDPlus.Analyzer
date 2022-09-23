@@ -129,7 +129,6 @@ public static class SegmentCheck
                 yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.DataVariable;
-                yield return SegmentType.Return;
                 yield return SegmentType.For;
                 yield return SegmentType.ParFor;
                 yield return SegmentType.ParWhile;
@@ -160,7 +159,6 @@ public static class SegmentCheck
                 yield return SegmentType.Thread;
                 yield return SegmentType.Exit;
                 yield return SegmentType.VhdlFunction;
-                yield return SegmentType.Return;
                 break;
             case SegmentType.Case:
                 yield return SegmentType.When;
@@ -263,7 +261,6 @@ public static class SegmentCheck
                 yield return SegmentType.SubType;
                 yield return SegmentType.VariableDeclaration;
                 yield return SegmentType.DataVariable;
-                yield return SegmentType.Return;
                 yield return SegmentType.For;
                 yield return SegmentType.While;
                 yield return SegmentType.SeqWhile;
@@ -402,9 +399,6 @@ public static class SegmentCheck
             case SegmentType.IncludePackage:
                 yield return SegmentType.IncludePackage;
                 break;
-            case SegmentType.Function:
-                yield return SegmentType.Return;
-                break;
             case SegmentType.For:
             case SegmentType.While:
             case SegmentType.SeqFor:
@@ -427,7 +421,6 @@ public static class SegmentCheck
             case SegmentType.Case:
             case SegmentType.When:
             case SegmentType.With:
-            case SegmentType.Return:
                 yield return SegmentType.VhdlFunction;
                 yield return SegmentType.DataVariable;
                 yield return SegmentType.NativeDataValue;

@@ -52,10 +52,6 @@ public static class SegmentInfo
             "Runs operation \"revisons\" times (i can be used as number that is increased every cycle)\ni IN 0 to [revisions]"
         },
         {
-            SegmentType.Return,
-            "In Function parameter: \"(return NATURAL; ...\" = Function return NATURAL\nIn code: stops function and return value e.g. return 1;"
-        },
-        {
             SegmentType.Exit,
             "\"exit;\" Can be used to exit a For or While loop before finished with all revisions (not for While or SeqFor in Thread)"
         },
