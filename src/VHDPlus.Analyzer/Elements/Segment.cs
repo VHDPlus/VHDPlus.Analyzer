@@ -42,6 +42,7 @@ public enum SegmentType
     NativeDataValue,
     ComponentMember,
     VhdlFunction,
+    VhdlFunctionReturn,
     Record,
     Array,
     Range,
