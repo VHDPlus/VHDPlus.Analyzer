@@ -284,7 +284,7 @@ public static class Analyzer
                 DiagnosticLevel.Error, s));
 
         foreach (var s in context.UnresolvedTypes)
-            context.Diagnostics.Add(new MissingComponentDiagnostic(context, $"Undefined Type {s.NameOrValue}",
+            context.Diagnostics.Add(new MissingComponentDiagnostic(context, $"Undefined Type {s.LastName}",
                 DiagnosticLevel.Warning, s));
 
 
