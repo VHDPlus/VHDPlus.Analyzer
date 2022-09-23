@@ -150,6 +150,10 @@ public class SegmentParserContext
             case SegmentType.NewFunction:
                 AnalyzerContext.UnresolvedSeqFunctions.Add(newSegment);
                 break;
+            case SegmentType.Function:
+                AnalyzerContext.AddLocalFunction(words.Last().ToLower(),
+                    new CustomDefinedFunction(words.Last()){Owner = newSegment});
+                break;
             case SegmentType.SeqFunction:
                 if (words.Length > 0)
                 {

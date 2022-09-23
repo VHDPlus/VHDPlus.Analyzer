@@ -127,9 +127,6 @@ public static class ParserHelper
             }
             case SegmentType.Function:
             {
-                if (!context.AnalyzerContext.AvailableFunctions.ContainsKey(words.Last().ToLower()))
-                    context.AnalyzerContext.AddLocalFunction(words.Last().ToLower(),
-                        new CustomDefinedFunction(words.Last()));
                 return (SegmentType.Function, DataType.Unknown);
             }
             case SegmentType.Return when words.Length == 2 && context.CurrentSegment is
@@ -139,7 +136,7 @@ public static class ParserHelper
                 {
                     var dataType = GetNativeDataType(words[1]);
                     if (dataType == DataType.Unknown) dataType = GetDeclaredDataType(context.AnalyzerContext, words[1]);
-                    func.ReturnType = dataType;
+                    if(context.CurrentParsePosition is ParsePosition.Parameter) func.ReturnType = dataType;
                     return (SegmentType.Return, dataType);
                 }
 
@@ -433,7 +430,7 @@ public static class ParserHelper
             else
             {
                 if (variableOwner is Segment { SegmentType: SegmentType.Function } func &&
-                    AnalyzerHelper.SearchFunction(context.CurrentSegment, func.LastName.ToLower()) is
+                    AnalyzerHelper.SearchFunction(func, func.LastName.ToLower()) is
                         { } funcOwner)
                     if (context.CurrentParsePosition is ParsePosition.Parameter &&
                         context.CurrentSegment.Parent != null &&

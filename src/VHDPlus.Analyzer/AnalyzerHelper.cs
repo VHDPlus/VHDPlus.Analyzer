@@ -163,6 +163,10 @@ public static class AnalyzerHelper
 
         if (functions == null) return null;
 
+        var funcOwner = functions.FirstOrDefault(x => x.Owner == start);
+
+        if (funcOwner != null) return funcOwner;
+
         //Find right overload
         if (start.Parameter.Any())
             foreach (var f in functions)

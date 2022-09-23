@@ -55,14 +55,11 @@ public static class Analyzer
             if (context.UnresolvedTypes[i].SegmentType is SegmentType.Return)
             {
                 if (!customTypes.ContainsKey(context.UnresolvedTypes[i].LastName.ToLower())) continue;
-                if (context.UnresolvedTypes[i].SegmentType is SegmentType.Return)
-                {
-                    var owner = ParserHelper.GetVariableOwner(customTypes, context.UnresolvedTypes[i],
-                        VariableType.Variable);
-                    if (owner is Segment { SegmentType: SegmentType.Function } funct &&
-                        AnalyzerHelper.SearchFunction(context.UnresolvedTypes[i], funct.LastName) is { } functOwner)
-                        functOwner.ReturnType = customTypes[context.UnresolvedTypes[i].LastName.ToLower()];
-                }
+                var owner = ParserHelper.GetVariableOwner(customTypes, context.UnresolvedTypes[i],
+                    VariableType.Variable);
+                if (owner is Segment { SegmentType: SegmentType.Function } funct &&
+                    AnalyzerHelper.SearchFunction(funct, funct.LastName) is { } functOwner)
+                    functOwner.ReturnType = customTypes[context.UnresolvedTypes[i].LastName.ToLower()];
 
                 context.UnresolvedTypes.RemoveAt(i);
                 i--;
@@ -115,7 +112,7 @@ public static class Analyzer
             }
 
             if (variableOwner is Segment { SegmentType: SegmentType.Function } func &&
-                AnalyzerHelper.SearchFunction(context.UnresolvedTypes[i], func.LastName) is { } funcOwner)
+                AnalyzerHelper.SearchFunction(func, func.LastName) is { } funcOwner)
             {
                 var par = funcOwner.Parameters.FirstOrDefault(x =>
                     x.Name.Equals(varName, StringComparison.OrdinalIgnoreCase));

@@ -13,4 +13,5 @@ public class CustomDefinedFunction : IParameterOwner
     public List<FunctionParameter> Parameters { get; } = new();
     public string Name { get; }
     public string? Description { get; }
+    public Segment? Owner { get; set; }
 }
