@@ -5,7 +5,6 @@ namespace VHDPlus.Analyzer.Checks;
 
 public static class TypeCheck
 {
-    
     public static void CheckFunctionParameter(AnalyzerContext context, Segment function)
     {
         CustomBuiltinFunction.DefaultBuiltinFunctions.TryGetValue(function.LastName.ToLower(), out var builtin);
@@ -45,6 +44,25 @@ public static class TypeCheck
         var currentOperator = child.ConcatOperator;
         //Check types
         if (currentOperator is null or "when" or "is" or "else" or "," or "and" or "." or ":" or "or" or "of" or "not" or "range") return;
+
+        if (currentOperator is "return" && !AnalyzerHelper.InParameter(child))
+        {
+            var topFunction = AnalyzerHelper.SearchTopSegment(child, SegmentType.Function);
+            if (topFunction != null)
+            {
+                var func = AnalyzerHelper.SearchFunction(topFunction, topFunction.LastName);
+                if (func != null)
+                {
+                    if (!AnalyzerHelper.AreTypesCompatible(child.DataType, func.ReturnType, ""))
+                    {
+                        context.Diagnostics.Add(new TypeCheckDiagnostic(context, $"Invalid return type. Expected {func.ReturnType}",
+                            DiagnosticLevel.Warning, child));
+                    }
+                }
+            }
+            
+            return;
+        }
         
         var (fD, segment) = ChildOperatorCheck(child);
         child = segment;

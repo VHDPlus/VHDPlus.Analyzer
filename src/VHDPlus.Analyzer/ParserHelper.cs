@@ -391,11 +391,11 @@ public static class ParserHelper
                 if (segment.ConcatOperator is not ",")
                 {
                     if (variableType == VariableType.Unknown) variableType = GetVariableType(segment.NameOrValue);
-                    segment.SegmentType = SegmentType.VariableDeclaration;
                     break;
                 }
             }
 
+            segment.SegmentType = SegmentType.VariableDeclaration;
             segment = segment.Parent;
         } while (segment != null);
 

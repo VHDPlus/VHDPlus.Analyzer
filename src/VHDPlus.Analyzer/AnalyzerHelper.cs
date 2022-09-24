@@ -111,6 +111,7 @@ public static class AnalyzerHelper
         while (start.Parent != null)
         {
             if (start.Variables.ContainsKey(varName.ToLower())) return start.Variables[varName.ToLower()];
+            if (start.SegmentType is SegmentType.SeqFunction) break;
             start = start.Parent;
         }
 

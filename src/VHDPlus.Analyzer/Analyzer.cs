@@ -75,6 +75,8 @@ public static class Analyzer
             }
 
             var parent = context.UnresolvedTypes[i].Parent;
+
+            List<string> varNames = new List<string>();
             if (context.UnresolvedTypes[i].ConcatOperator is ":" ||
                 ParserHelper.VhdlIos.Contains(context.UnresolvedTypes[i].ConcatOperator))
             {
@@ -82,6 +84,7 @@ public static class Analyzer
                 while (parent != null)
                 {
                     parent.DataType = customTypes[context.UnresolvedTypes[i].NameOrValue.ToLower()];
+                    varNames.Add(parent.LastName.ToLower());
                     if (parent.ConcatOperator != ",") break;
                     parent = parent.Parent;
                 }
@@ -95,9 +98,12 @@ public static class Analyzer
 
             var varName = parent.NameOrValue.Split(' ').Last();
 
-            if (variableOwner.Variables.ContainsKey(varName.ToLower()))
-                variableOwner.Variables[varName.ToLower()].DataType = parent.DataType;
-
+            foreach (var n in varNames)
+            {
+                if (variableOwner.Variables.ContainsKey(n))
+                    variableOwner.Variables[n].DataType = parent.DataType;
+            }
+            
             if (variableOwner is Segment { SegmentType: SegmentType.SeqFunction } seqFunc &&
                 AnalyzerHelper.SearchSeqFunction(context.UnresolvedTypes[i], seqFunc.LastName) is { } seqOwner)
             {
