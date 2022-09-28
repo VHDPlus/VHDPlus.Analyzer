@@ -1,7 +1,23 @@
-Package Supi
+Package Supi Supi Dupi
 {
-    Function test (return STD_LOGIC;)
-    {
-        return '1';
+    Thread {
+        Step{ 
+             led 5 6;
+        }
+        Step{
+        
+        }
+    }
+}
+Package Hund
+{
+    Thread {
+    
+    }
+}
+Package Hund
+{
+    Thread {
+    
     }
 }

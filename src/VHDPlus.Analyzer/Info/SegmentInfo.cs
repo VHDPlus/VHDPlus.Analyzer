@@ -109,68 +109,6 @@ public static class SegmentInfo
         return description ?? "";
     }
 
-    public static string GetInfoMarkdown(Segment segment)
-    {
-        var words = segment.NameOrValue.Split(' ');
-        switch (segment.SegmentType)
-        {
-            case SegmentType.Function:
-            case SegmentType.VhdlFunction:
-                if (AnalyzerHelper.SearchFunction(segment, segment.NameOrValue.ToLower()) is { } function)
-                    return FunctionInfo.GetInfoMarkdown(function);
-                return "";
-
-            case SegmentType.CustomBuiltinFunction:
-                if (CustomBuiltinFunction.DefaultBuiltinFunctions.ContainsKey(segment.NameOrValue.ToLower()))
-                {
-                    var func = CustomBuiltinFunction.DefaultBuiltinFunctions[segment.NameOrValue.ToLower()];
-                    return FunctionInfo.GetInfoMarkdown(func);
-                }
-                return "";
-            case SegmentType.NewFunction:
-                if (AnalyzerHelper.SearchSeqFunction(segment, segment.LastName) is { } seqFunction)
-                    return FunctionInfo.GetInfoMarkdown(seqFunction);
-                return "";
-            case SegmentType.ComponentMember:
-                var parent = AnalyzerHelper.SearchTopSegment(segment, SegmentType.NewComponent);
-                if (parent != null && segment.Context.AvailableComponents.ContainsKey(parent.LastName.ToLower()))
-                {
-                    var comp = segment.Context.AvailableComponents[parent.LastName.ToLower()];
-                    if (comp.Variables.ContainsKey(segment.NameOrValue.ToLower()))
-                    {
-                        var variable = comp.Variables[segment.NameOrValue.ToLower()];
-                        var comment = GetLineCommentForSegment(variable.Owner);
-                        return $"```vhdp\n{PrintSegment.Convert(variable.Owner).Trim()} {comment}\n```";
-                    }
-                }
-
-                return "";
-            case SegmentType.NewComponent:
-                if (words.Length == 2 && segment.Context.AvailableComponents.ContainsKey(words[1].ToLower()))
-                    return GetComponentInfoMarkdown(segment.Context.AvailableComponents[words[1].ToLower()]);
-                return "";
-            case SegmentType.DataVariable:
-            case SegmentType.VariableDeclaration:
-                DefinedVariable? dataVar = null;
-                if (segment.ConcatOperator is ".")
-                    dataVar = AnalyzerHelper.SearchVariableInRecord(segment);
-                else
-                    dataVar = AnalyzerHelper.SearchVariable(segment, segment.NameOrValue);
-                if (dataVar != null)
-                    return
-                        $"```vhdp\n{(segment.SegmentType is SegmentType.VariableDeclaration ? "declaration -> " : "")}{PrintSegment.Convert(dataVar.Owner).Trim()}\n```";
-                return "";
-            case SegmentType.Enum:
-                var definedEnum = AnalyzerHelper.SearchEnum(segment.Context, segment.NameOrValue);
-                if (definedEnum != null) return $"```vhdp\n{segment.NameOrValue} : {definedEnum.Name}\n```";
-                return "";
-            case SegmentType.TypeUsage:
-                return segment.DataType.Description;
-            default:
-                return GetInfo(segment.SegmentType);
-        }
-    }
-
     public static string GetInfoConcatMarkdown(string concatOperator)
     {
         switch (concatOperator)
@@ -200,61 +138,6 @@ public static class SegmentInfo
         if (!parameter) Snippets.TryGetValue(type, out snippet);
         else SnippetsParameter.TryGetValue(type, out snippet);
         return snippet ?? type.ToString();
-    }
-
-    public static string GetComponentInsert(Segment comp)
-    {
-        var str = "";
-        var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
-            .OrderByDescending(x => x.Value.VariableType).ToList();
-        if (list.Any())
-        {
-            var gap = false;
-            var minLength = list.Max(x => x.Value.Name.Length);
-            foreach (var io in list)
-            {
-                if (!gap && io.Value.VariableType is VariableType.Io)
-                {
-                    if (io.Key != list.First().Key) str += "\n";
-                    gap = true;
-                }
-
-                var name = io.Value.Name;
-                for (var i = name.Length; i < minLength; i++) name += " ";
-                str += "\n" + name + " => $0,";
-            }
-        }
-
-        return $"New{comp.NameOrValue}\n({str}\n);";
-    }
-
-    public static string GetComponentInfoMarkdown(Segment comp)
-    {
-        var comment = GetCommentForSegment(comp);
-        if (!string.IsNullOrEmpty(comment)) comment += '\n';
-        var str = "";
-
-        var generics = comp.Variables.Select(x => x.Value).Where(x => x.VariableType is VariableType.Generic).ToList();
-
-        if (generics.Any())
-        {
-            str += "\n    Generic\n    (";
-            foreach (var io in generics)
-            {
-                var lineComment = GetLineCommentForSegment(io.Owner);
-                str += $"\n        {PrintSegment.Convert(io.Owner).Trim()} {lineComment}";
-            }
-
-            str += "\n    );\n";
-        }
-
-        foreach (var io in comp.Variables.Select(x => x.Value).Where(x => x is DefinedIo).Cast<DefinedIo>())
-        {
-            var lineComment = GetLineCommentForSegment(io.Owner);
-            str += $"\n    {PrintSegment.Convert(io.Owner).Trim()} {lineComment}";
-        }
-
-        return $"```vhdp\n{comment}New{comp.NameOrValue}\n({str}\n);\n```";
     }
 
     public static string GetCommentForSegment(Segment s)

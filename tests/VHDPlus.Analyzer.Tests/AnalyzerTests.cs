@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using VHDPlus.Analyzer.Checks;
 using VHDPlus.Analyzer.Elements;
 using VHDPlus.Analyzer.Info;
 using Xunit;
@@ -40,7 +39,7 @@ namespace VHDPlus.Analyzer.Tests
             }
             _output.WriteLine("---------");
             
-            foreach (var segment in result.TopSegment.Children)
+            foreach (var segment in result.TopLevels)
             {
                 Helper.PrintSegment(segment, _output);
             }
@@ -85,7 +84,7 @@ namespace VHDPlus.Analyzer.Tests
         public void CrawlTest()
         {
             var result = RunAnalyzer(AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check,Path.Combine(AssetsFolder, "Debug.vhdp"));
-            SegmentCrawler.GetPairs(result.TopSegment, (parent, child, parameter, thread) =>
+            SegmentCrawler.GetPairs(result.TopLevels.First(), (parent, child, parameter, thread) =>
             {
                 _output.WriteLine($"Parent: {parent}; Child: {child}; Parameter: {parameter}; Thread: {thread}");
             });
@@ -95,22 +94,9 @@ namespace VHDPlus.Analyzer.Tests
         public void SegmentPrintTest()
         {
             var result = RunAnalyzer(AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check,Path.Combine(AssetsFolder, "Debug.vhdp"));
-            _output.WriteLine(PrintSegment.Convert(result.TopSegment));
+            _output.WriteLine(PrintSegment.Convert(result.TopLevels.First()));
         }
-        
-        [Fact]
-        public void AnalyzerGetSegmentFromOffsetTest()
-        {
-            var text = File.ReadAllText(Path.Combine(AssetsFolder, "OV5647_Camera.vhdp"));
-            var result = Analyzer.Analyze("",text, AnalyzerMode.Indexing | AnalyzerMode.Resolve | AnalyzerMode.Check);
 
-            var segment = AnalyzerHelper.GetSegmentFromOffset(result,  5217);
-            
-            Assert.NotNull(segment);
-            //TODO FIX TEST
-            //Assert.Equal(SegmentType.DataVariable, segment?.SegmentType);
-        }
-        
         [Fact]
         public void AnalyzerParameterTests()
         {

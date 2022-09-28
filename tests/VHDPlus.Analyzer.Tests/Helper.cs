@@ -10,9 +10,8 @@ public static class Helper
     {
         var tab = "";
         for (var i = 0; i < depth; i++) tab += "  ";
-
-        var op = s.ConcatSegment ? $"[{s.ConcatOperator}]" : "";
-        var str = tab + op + s.NameOrValue + " " +s.Offset + " :" + s.SegmentType + ","+ s.DataType;
+        
+        var str = tab + s.Value + " " +s.Offset + " :" + s.SegmentType + " C: " + s.Concat;
         output.WriteLine(str);
            
         foreach (var par in s.Parameter)

@@ -21,12 +21,12 @@ public class GenericAnalyzerDiagnostic : IAnalyzerDiagnostic
     }
 
     public GenericAnalyzerDiagnostic(AnalyzerContext context, string message, DiagnosticLevel level, Segment s) : this(
-        context, message, level, s.Offset, s.Offset + s.NameOrValue.Length)
+        context, message, level, s.Offset, s.EndOffset)
     {
     }
 
     public GenericAnalyzerDiagnostic(SegmentParserContext context, string message, DiagnosticLevel level) : this(
-        context.AnalyzerContext, message, level, context.CurrentInnerIndex, context.LastInnerIndex)
+        context.AnalyzerContext, message, level, context.CurrentIndex-context.CurrentInner.Length, context.CurrentIndex)
     {
     }
 

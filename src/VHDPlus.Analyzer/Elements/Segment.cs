@@ -3,7 +3,6 @@
 public enum SegmentType
 {
     Unknown,
-    GlobalSegment,
     EmptyName,
     Component,
     Package,
@@ -64,40 +63,15 @@ public enum SegmentType
     Port
 }
 
-public class Segment : IVariableOwner
+public class Segment
 {
-    public Segment(AnalyzerContext context, Segment? parent, string nameOrValue, SegmentType segmentType,
-        DataType dataType, int offset,
-        string? concatOperator = null, int concatOperatorIndex = 0)
-    {
-        Context = context;
-        Parent = parent;
-        NameOrValue = nameOrValue;
-        SegmentType = segmentType;
-        DataType = dataType;
-        Offset = offset;
-        ConcatOperator = concatOperator;
-        ConcatOperatorIndex = concatOperatorIndex;
-    }
-
-    public AnalyzerContext Context { get; }
     public SegmentType SegmentType { get; set; }
-    public DataType DataType { get; set; }
-    public int Offset { get; }
-    public int EndOffset { get; set; } //End offset including children
-    public Segment? Parent { get; }
+    public AnalyzerContext Context { get; set; }
+    public Segment? Parent { get; set; }
     public List<Segment> Children { get; } = new();
     public List<List<Segment>> Parameter { get; } = new();
-    public string NameOrValue { get; set; }
-    public bool ConcatSegment => ConcatOperator != null;
-    public string? ConcatOperator { get; set; }
-    public int ConcatOperatorIndex { get; }
-    public bool SymSegment { get; set; } //Segment ending with ;
-    public string LastName => NameOrValue.Split(' ').Last();
-    public Dictionary<string, DefinedVariable> Variables { get; } = new();
-
-    public override string ToString()
-    {
-        return NameOrValue;
-    }
+    public int Offset { get; set; }
+    public int EndOffset { get; set; } //End offset including children
+    public string? Value { get; set; }
+    public bool Concat { get; set; }
 }

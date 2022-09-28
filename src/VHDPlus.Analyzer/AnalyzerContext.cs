@@ -33,7 +33,7 @@ public class AnalyzerContext
     public bool IncludeExists { get; set; }
     public readonly List<string> Includes = new();
     public readonly List<int> LineOffsets = new() { 0 };
-    public readonly Segment TopSegment;
+    public readonly List<Segment> TopLevels = new();
     public readonly List<Segment> UnresolvedComponents = new();
     public readonly List<Segment> UnresolvedSegments = new();
     public readonly List<Segment> UnresolvedSeqFunctions = new();
@@ -42,10 +42,6 @@ public class AnalyzerContext
     public AnalyzerContext(string filepath, string text)
     {
         FilePath = filepath;
-        TopSegment = new Segment(this, null, "GlobalScope", SegmentType.GlobalSegment, DataType.Unknown, 0)
-        {
-            EndOffset = text.Length
-        };
 
         AvailableComponents = new ReadOnlyDictionary<string, Segment>(_availableComponents);
         AvailablePackages = new ReadOnlyDictionary<string, Segment>(_availablePackages);
@@ -54,15 +50,8 @@ public class AnalyzerContext
         AvailableExposingVariables = new ReadOnlyDictionary<string, DefinedVariable>(_availableExposingVariables);
         AvailableSeqFunctions = new ReadOnlyDictionary<string, CustomDefinedSeqFunction>(_availableSeqFunctions);
 
-        //Default stuff
-        if (Path.GetExtension(filepath) != ".ghdp")
-            _availableExposingVariables.Add("clk",
-                new DefinedIo(TopSegment, "CLK", DataType.StdLogic, VariableType.Io, IoType.In, 0));
-        
         AddPackage(PredefinedFunctions.Standard, PredefinedTypes.Standard, new Dictionary<string, DefinedVariable>());
     }
-
-    public IEnumerable<Segment> TopLevels => TopSegment.Children;
 
     public int GetOffset(int line, int col)
     {
