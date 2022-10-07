@@ -74,6 +74,17 @@ public static class Analyzer
                 //customTypes[subTypeParent.LastName.ToLower()] = subTypeParent.DataType;
             }
 
+            if (context.UnresolvedTypes[i].Parent is {SegmentType: SegmentType.Array, Parent: not null} arrayParent)
+            {
+                if (context.AvailableTypes.TryGetValue(arrayParent.Parent.LastName.ToLower(), out var type))
+                {
+                    if (type is CustomDefinedArray array)
+                    {
+                        array.ArrayType = customTypes[context.UnresolvedTypes[i].NameOrValue.ToLower()];
+                    }
+                }
+            }
+
             var parent = context.UnresolvedTypes[i].Parent;
 
             List<string> varNames = new List<string>();
