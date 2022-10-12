@@ -18,8 +18,9 @@ public static class PrintSegment
     {
         if (start.ConcatSegment)
         {
-            if (start.ConcatOperator is "." or "'") sb.Append(start.ConcatOperator);
-            else if(start.ConcatOperator is not "{") sb.Append($" {start.ConcatOperator} ");
+            if (start.ConcatOperator is not ("." or "'") && (sb.Length > 0 && sb[^1] != ' ')) sb.Append(' ');
+            sb.Append(start.ConcatOperator);
+            if (start.ConcatOperator is not ("." or "'")) sb.Append(' ');
         }
         else
         {
