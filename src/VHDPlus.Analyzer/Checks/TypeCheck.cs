@@ -53,9 +53,10 @@ public static class TypeCheck
                 var func = AnalyzerHelper.SearchFunction(topFunction, topFunction.LastName);
                 if (func != null)
                 {
-                    if (!AnalyzerHelper.AreTypesCompatible(child.DataType, func.ReturnType, ""))
+                    var dt = ConvertTypeParameter(child);
+                    if (!AnalyzerHelper.AreTypesCompatible(dt, func.ReturnType, ""))
                     {
-                        context.Diagnostics.Add(new TypeCheckDiagnostic(context, $"Invalid return type. Expected {func.ReturnType}",
+                        context.Diagnostics.Add(new TypeCheckDiagnostic(context, $"Invalid return type. Expected {func.ReturnType}, found {dt}",
                             DiagnosticLevel.Warning, child));
                     }
                 }
