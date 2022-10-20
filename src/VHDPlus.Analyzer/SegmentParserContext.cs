@@ -128,6 +128,9 @@ public class SegmentParserContext
             case SegmentType.TypeUsage when dataType == DataType.Unknown:
                 AnalyzerContext.UnresolvedTypes.Add(newSegment);
                 break;
+            case SegmentType.NewComponent:
+                AnalyzerContext.UnresolvedComponents.Add(newSegment);
+                break;
             case SegmentType.Vhdl:
                 VhdlMode = true;
                 break;
