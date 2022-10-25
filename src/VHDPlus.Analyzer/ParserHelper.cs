@@ -388,14 +388,13 @@ public static class ParserHelper
             if (segment.ConcatOperator is not ":")
             {
                 names.Add(segment);
+                segment.SegmentType = SegmentType.VariableDeclaration;
                 if (segment.ConcatOperator is not ",")
                 {
                     if (variableType == VariableType.Unknown) variableType = GetVariableType(segment.NameOrValue);
                     break;
                 }
             }
-
-            segment.SegmentType = SegmentType.VariableDeclaration;
             segment = segment.Parent;
         } while (segment != null);
 
