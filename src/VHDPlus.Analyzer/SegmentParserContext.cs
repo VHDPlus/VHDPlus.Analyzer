@@ -215,7 +215,7 @@ public class SegmentParserContext
 
         if (!PopBlock())
             AnalyzerContext.Diagnostics.Add(
-                new SegmentParserDiagnostic(this, "Unexpected end", DiagnosticLevel.Error));
+                new SegmentParserDiagnostic(this.AnalyzerContext, "Unexpected end of codeblock", DiagnosticLevel.Error, CurrentIndex, CurrentIndex+1));
 
         ClearCurrent();
     }

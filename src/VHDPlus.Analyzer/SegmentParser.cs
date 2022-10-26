@@ -89,7 +89,7 @@ public static class SegmentParser
         {
             context.AnalyzerContext.Diagnostics.Add(new SegmentParserDiagnostic(context.AnalyzerContext,
                 "Unexpected end of file",
-                DiagnosticLevel.Error, content.Length > 1 ? content.Length - 2 : 0, content.Length - 1));
+                DiagnosticLevel.Error, content.Length > 1 ? content.Length - 1 : 0, content.Length));
             while (context.PopBlock())
             {
             }
