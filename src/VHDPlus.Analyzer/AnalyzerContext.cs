@@ -97,7 +97,7 @@ public class AnalyzerContext
     
     public void AddLocalComponent(string key, Segment owner)
     {
-        if (!_availableComponents.ContainsKey(key))
+        if (!_components.ContainsKey(key))
         {
             _components.Add(key, owner);
             //_availableComponents.Add(key, owner);
