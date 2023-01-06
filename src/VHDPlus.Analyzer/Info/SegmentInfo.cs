@@ -227,6 +227,32 @@ public static class SegmentInfo
 
         return $"New{comp.NameOrValue}\n({str}\n);";
     }
+    
+    public static string GetComponentInsertVhdl(Segment comp)
+    {
+        var str = "";
+        var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
+            .OrderByDescending(x => x.Value.VariableType).ToList();
+        if (list.Any())
+        {
+            var gap = false;
+            var minLength = list.Max(x => x.Value.Name.Length);
+            foreach (var io in list)
+            {
+                if (!gap && io.Value.VariableType is VariableType.Io)
+                {
+                    if (io.Key != list.First().Key) str += "\n";
+                    gap = true;
+                }
+
+                var name = io.Value.Name;
+                for (var i = name.Length; i < minLength; i++) name += " ";
+                str += "\n" + name + " => $0,";
+            }
+        }
+
+        return $"NewVHDL{comp.NameOrValue}\n({str}\n);";
+    }
 
     public static string GetComponentInfoMarkdown(Segment comp)
     {
