@@ -228,6 +228,52 @@ public static class SegmentInfo
         return $"New{comp.NameOrValue}\n({str}\n);";
     }
     
+    public static string GetComponentPortInsertVhdl(Segment comp)
+    {
+        var str = "";
+        var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
+            .OrderByDescending(x => x.Value.VariableType).ToList();
+        if (list.Any())
+        {
+            var gap = false;
+            var minLength = list.Max(x => x.Value.Name.Length);
+            foreach (var io in list)
+            {
+                if (str == "")
+                {
+                    if (io.Value.VariableType is VariableType.Io)
+                    {
+                        str = "port map (";
+                    }
+                    else
+                    {
+                        str = "generic map (";
+                    }
+                }
+
+                if (!gap && io.Value.VariableType is VariableType.Io)
+                {
+                    if (io.Key != list.First().Key)
+                    {
+                        str += "\n) port map (";
+                    }
+                    gap = true;
+
+                    var clk = "CLK";
+                    for (var i = clk.Length; i < minLength; i++) clk += " ";
+                    str += "\n" + clk + " => $0";
+                }
+
+
+                var name = io.Value.Name;
+                for (var i = name.Length; i < minLength; i++) name += " ";
+                str += "\n" + name + " => $0";
+            }
+        }
+
+        return $"[name] : {comp.LastName}\n{str}\n);";
+    }
+
     public static string GetComponentInsertVhdl(Segment comp)
     {
         var str = "";
@@ -239,19 +285,43 @@ public static class SegmentInfo
             var minLength = list.Max(x => x.Value.Name.Length);
             foreach (var io in list)
             {
+                var name = "";
+
+                if (str == "")
+                {
+                    if (io.Value.VariableType is VariableType.Io)
+                    {
+                        str = "port (";
+                    }
+                    else
+                    {
+                        str = "generic (";
+                    }
+                }
+                else str += ";";
+
                 if (!gap && io.Value.VariableType is VariableType.Io)
                 {
-                    if (io.Key != list.First().Key) str += "\n";
+                    if (io.Key != list.First().Key)
+                    {
+                        str = str.TrimEnd(';');
+                        str += "\n); port (";
+                    }
                     gap = true;
+
+                    var clk = "CLK";
+                    for (var i = clk.Length; i < minLength; i++) clk += " ";
+                    str += "\n" + clk + " : IN STD_LOGIC;";
                 }
 
-                var name = io.Value.Name;
+
+                name += io.Value.Name;
                 for (var i = name.Length; i < minLength; i++) name += " ";
-                str += "\n" + name + " => $0,";
+                str += "\n" + name + PrintSegment.Convert(io.Value.Owner).Trim().TrimEnd(';')[io.Value.Name.Length..];
             }
         }
 
-        return $"NewVHDL{comp.NameOrValue}\n({str}\n);";
+        return $"COMPONENT {comp.LastName} IS\n{str}\n);\nend component {comp.LastName};";
     }
 
     public static string GetComponentInfoMarkdown(Segment comp)
