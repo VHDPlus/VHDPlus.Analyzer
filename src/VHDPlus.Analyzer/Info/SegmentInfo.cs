@@ -233,6 +233,7 @@ public static class SegmentInfo
         var str = "";
         var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
             .OrderByDescending(x => x.Value.VariableType).ToList();
+        var isVhdp = Path.GetExtension(comp.Context.FilePath).Equals(".vhdp", StringComparison.OrdinalIgnoreCase);
         if (list.Any())
         {
             var gap = false;
@@ -259,9 +260,12 @@ public static class SegmentInfo
                     }
                     gap = true;
 
-                    var clk = "CLK";
-                    for (var i = clk.Length; i < minLength; i++) clk += " ";
-                    str += "\n" + clk + " => $0";
+                    if (isVhdp)
+                    {
+                        var clk = "CLK";
+                        for (var i = clk.Length; i < minLength; i++) clk += " ";
+                        str += "\n" + clk + " => $0";
+                    }
                 }
 
 
@@ -279,6 +283,7 @@ public static class SegmentInfo
         var str = "";
         var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
             .OrderByDescending(x => x.Value.VariableType).ToList();
+        var isVhdp = Path.GetExtension(comp.Context.FilePath).Equals(".vhdp", StringComparison.OrdinalIgnoreCase);
         if (list.Any())
         {
             var gap = false;
@@ -309,9 +314,12 @@ public static class SegmentInfo
                     }
                     gap = true;
 
-                    var clk = "CLK";
-                    for (var i = clk.Length; i < minLength; i++) clk += " ";
-                    str += "\n" + clk + " : IN STD_LOGIC;";
+                    if (isVhdp)
+                    {
+                        var clk = "CLK";
+                        for (var i = clk.Length; i < minLength; i++) clk += " ";
+                        str += "\n" + clk + " : IN STD_LOGIC;";
+                    }
                 }
 
 
