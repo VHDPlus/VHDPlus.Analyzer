@@ -231,9 +231,9 @@ public static class SegmentInfo
     public static string GetComponentPortInsertVhdl(Segment comp)
     {
         var str = "";
+        var isVhdp = Path.GetExtension(comp.Context.FilePath).Equals(".vhdp", StringComparison.OrdinalIgnoreCase);
         var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
             .OrderByDescending(x => x.Value.VariableType).ToList();
-        var isVhdp = Path.GetExtension(comp.Context.FilePath).Equals(".vhdp", StringComparison.OrdinalIgnoreCase);
         if (list.Any())
         {
             var gap = false;
@@ -256,6 +256,7 @@ public static class SegmentInfo
                 {
                     if (io.Key != list.First().Key)
                     {
+                        str = str.TrimEnd(',');
                         str += "\n) port map (";
                     }
                     gap = true;
@@ -264,26 +265,26 @@ public static class SegmentInfo
                     {
                         var clk = "CLK";
                         for (var i = clk.Length; i < minLength; i++) clk += " ";
-                        str += "\n" + clk + " => $0";
+                        str += "\n" + clk + " => $0,";
                     }
                 }
 
 
                 var name = io.Value.Name;
                 for (var i = name.Length; i < minLength; i++) name += " ";
-                str += "\n" + name + " => $0";
+                str += "\n" + name + " => $0,";
             }
         }
 
-        return $"[name] : {comp.LastName}\n{str}\n);";
+        return $"[name] : {comp.LastName}\n{str.TrimEnd(',')}\n);";
     }
 
     public static string GetComponentInsertVhdl(Segment comp)
     {
         var str = "";
+        var isVhdp = Path.GetExtension(comp.Context.FilePath).Equals(".vhdp", StringComparison.OrdinalIgnoreCase);
         var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
             .OrderByDescending(x => x.Value.VariableType).ToList();
-        var isVhdp = Path.GetExtension(comp.Context.FilePath).Equals(".vhdp", StringComparison.OrdinalIgnoreCase);
         if (list.Any())
         {
             var gap = false;
@@ -330,6 +331,57 @@ public static class SegmentInfo
         }
 
         return $"COMPONENT {comp.LastName} IS\n{str}\n);\nend component {comp.LastName};";
+    }
+
+    public static string GetComponentInsertVerilog(Segment comp)
+    {
+        var str = "";
+        var isVhdp = Path.GetExtension(comp.Context.FilePath).Equals(".vhdp", StringComparison.OrdinalIgnoreCase);
+        var list = comp.Variables.Where(x => x.Value.VariableType is VariableType.Io or VariableType.Generic)
+            .OrderByDescending(x => x.Value.VariableType).ToList();
+        if (list.Any())
+        {
+            var gap = false;
+            var minLength = list.Max(x => x.Value.Name.Length);
+            foreach (var io in list)
+            {
+                if (str == "")
+                {
+                    if (io.Value.VariableType is VariableType.Io)
+                    {
+                        str = "´instance name´$0 (";
+                    }
+                    else
+                    {
+                        str = "#(";
+                    }
+                }
+
+                if (!gap && io.Value.VariableType is VariableType.Io)
+                {
+                    if (io.Key != list.First().Key)
+                    {
+                        str = str.TrimEnd(',');
+                        str += "\n) ´instance name´$0 (";
+                    }
+                    gap = true;
+
+                    if (isVhdp)
+                    {
+                        var clk = "CLK";
+                        for (var i = clk.Length; i < minLength; i++) clk += " ";
+                        str += "\n    ." + clk + "($0),";
+                    }
+                }
+
+
+                var name = io.Value.Name;
+                for (var i = name.Length; i < minLength; i++) name += " ";
+                str += "\n    ." + name + "($0),";
+            }
+        }
+
+        return $"{comp.LastName} {str.TrimEnd(',')});";
     }
 
     public static string GetComponentInfoMarkdown(Segment comp)
