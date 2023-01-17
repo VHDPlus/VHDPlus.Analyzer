@@ -35,5 +35,8 @@
         VARIABLE b : UNSIGNED := a(0) & '1';
         
         VARIABLE c : BOOLEAN := 0 < 1-1 OR true;
+                
+        VARIABLE bit1,bit2 : STD_LOGIC;          
+        VARIABLE logic : STD_LOGIC_VECTOR := bit1 & (NOT bit2);
     }
 }
