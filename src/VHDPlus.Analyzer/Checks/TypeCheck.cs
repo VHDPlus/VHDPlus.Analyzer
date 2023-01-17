@@ -136,7 +136,7 @@ public static class TypeCheck
             case "&" when (cD == DataType.Unsigned || cD == DataType.StdLogic) &&
                           (sD == DataType.Unsigned || sD == DataType.StdLogic):
                 return (DataType.Unsigned, s);
-            case "'" when sD == DataType.StdLogicVector || sD == DataType.Signed || sD == DataType.Unsigned:
+            case "'" when sD == DataType.StdLogicVector || sD == DataType.Signed || sD == DataType.Unsigned || sD is CustomDefinedArray:
                 return (DataType.Integer, s);
             case "," when s.Parent is not {SegmentType: SegmentType.Function or SegmentType.VhdlFunction}:
                 return (DataType.Unknown, s);
