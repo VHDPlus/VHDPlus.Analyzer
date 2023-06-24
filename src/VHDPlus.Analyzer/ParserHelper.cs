@@ -173,7 +173,7 @@ public static class ParserHelper
                 {
                     var varName = words[0];
                     if (varName.ToLower() is not ("variable" or "signal") && context.CurrentSegment.Parameter.Count == 0 &&
-                        !context.CurrentSegment.Variables.ContainsKey(varName.ToLower()))
+                        AnalyzerHelper.SearchVariable(context.CurrentSegment, varName.ToLower()) == null)
                     {
                         context.CurrentSegment.Variables.Add(varName.ToLower(),
                             new DefinedVariable(context.CurrentSegment, varName, DataType.Integer,
